@@ -272,11 +272,11 @@ public class CommandHandler extends AbstractHandler implements IStartup, IExecut
 			synchronized(tapestryIndex) {
 				for (IFile file: files) {
 					if (TapestryTools.isComponentSpecification(file)) {
-						tapestryIndex.handleComponentSpecification(file);
+						// tapestryIndex.handleComponentSpecification(file);
 					} else if (TapestryTools.isPageSpecification(file)) {
-						tapestryIndex.handlePageSpecification(file);
+						// tapestryIndex.handlePageSpecification(file);
 					} else if (TapestryTools.isAppSpecification(file)) {
-						tapestryIndex.handleAppSpecification(file);
+						// tapestryIndex.handleAppSpecification(file);
 					}
 				}
 
