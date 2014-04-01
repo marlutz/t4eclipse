@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="TapestryCategory"
+            id="ch.mlutz.plugins.t4e.commands.category.tapestry">
+      </category>
+      <command
+            name="Switch to complement file"
+            categoryId="ch.mlutz.plugins.t4e.commands.category.tapestry"
+            id="ch.mlutz.plugins.t4e.commands.switchToComplementFile">
+      </command>
+      <command
+            name="Refresh Tapestry Project"
+            categoryId="ch.mlutz.plugins.t4e.commands.category.tapestry"
+            id="ch.mlutz.plugins.t4e.commands.refresh">
+      </command>
+      <command
+            name="Refresh All Tapestry Projects"
+            categoryId="ch.mlutz.plugins.t4e.commands.category.tapestry"
+            id="ch.mlutz.plugins.t4e.commands.refreshAll">
+      </command>
+      <command
+            name="Analyze Java Source File"
+            categoryId="ch.mlutz.plugins.t4e.commands.category.tapestry"
+            id="ch.mlutz.plugins.t4e.commands.analyzeJavaSourceFile">
+      </command>
+      <command
+            name="Add Maven Recursive Dependencies"
+            categoryId="ch.mlutz.plugins.t4e.commands.category.tapestry"
+            id="ch.mlutz.plugins.t4e.commands.addT4eClasspathContainer">
+            <!--
+            <state
+			     class="org.eclipse.ui.handlers.RegistryToggleState:true"
+			     id="org.eclipse.ui.commands.toggleState">
+			   </state>
+			-->
+      </command>
+      <command
+            name="Remove Maven Recursive Dependencies"
+            categoryId="ch.mlutz.plugins.t4e.commands.category.tapestry"
+            id="ch.mlutz.plugins.t4e.commands.removeT4eClasspathContainer">
+      </command>
+      <command
+            name="Find Tapestry Component"
+            categoryId="ch.mlutz.plugins.t4e.commands.category.tapestry"
+            id="ch.mlutz.plugins.t4e.commands.openTapestryComponent">
+      </command>
+   </extension>
+   
+   <!--
+   		handlers
+   -->
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            commandId="ch.mlutz.plugins.t4e.commands.switchToComplementFile"
+            class="ch.mlutz.plugins.t4e.handlers.CommandHandler">
+      </handler>
+      <handler
+            commandId="ch.mlutz.plugins.t4e.commands.refresh"
+            class="ch.mlutz.plugins.t4e.handlers.RefreshHandler">
+      </handler>
+      <handler
+            commandId="ch.mlutz.plugins.t4e.commands.refreshAll"
+            class="ch.mlutz.plugins.t4e.handlers.RefreshHandler">
+      </handler>
+      <handler
+            commandId="ch.mlutz.plugins.t4e.commands.analyzeJavaSourceFile"
+            class="ch.mlutz.plugins.t4e.handlers.AnalyzeHandler">
+      </handler>
+      <handler
+            commandId="ch.mlutz.plugins.t4e.commands.addT4eClasspathContainer"
+            class="ch.mlutz.plugins.t4e.handlers.ClasspathContainerHandler">
+      </handler>
+      <handler
+            commandId="ch.mlutz.plugins.t4e.commands.removeT4eClasspathContainer"
+            class="ch.mlutz.plugins.t4e.handlers.ClasspathContainerHandler">
+      </handler>
+      <handler
+            commandId="ch.mlutz.plugins.t4e.commands.openTapestryComponent"
+            class="ch.mlutz.plugins.t4e.handlers.OpenTapestryComponentHandler">
+            
+            <activeWhen>
+			    <with variable="activeEditorId">
+			       <equals value="ch.mlutz.plugins.t4e.editors.tapestryEditor"/>
+			    </with>
+			</activeWhen>
+      </handler>
+   </extension>
+   
+   <!--
+   		shortcuts
+   -->
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="ch.mlutz.plugins.t4e.commands.switchToComplementFile"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="Ctrl+Tab"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+      <key
+            commandId="ch.mlutz.plugins.t4e.commands.openTapestryComponent"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="Shift+F3"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+   </extension>
+   
+   <!-- context menu extension to package explorer -->
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
+            <separator
+	             name="ch.mlutz.plugins.t4e.separator"
+	             visible="true">
+	        </separator>
+            <menu
+               id="ch.mlutz.plugins.t4e.menus.packageexplorer.tapestry"
+               label="Tapestry">
+            <command
+                  commandId="ch.mlutz.plugins.t4e.commands.refresh"
+                  id="ch.mlutz.plugins.t4e.menus.packageexplorer.refresh"
+                  mnemonic="R">
+ 
+                    <visibleWhen>
+				           <with variable="activeMenuSelection">
+				            <iterate
+				                 ifEmpty="false">
+				            <or>
+				             <instanceof
+                           value="org.eclipse.core.resources.IProject"/>
+                           <instanceof
+                           value="org.eclipse.jdt.core.IJavaProject"/>
+                           </or>
+				            </iterate>
+				           </with>
+         			</visibleWhen>
+            </command>
+            <command
+                  commandId="ch.mlutz.plugins.t4e.commands.refreshAll"
+                  id="ch.mlutz.plugins.t4e.menus.packageexplorer.refreshAll"
+                  mnemonic="L">
+ 
+                    <visibleWhen>
+				           <with variable="activeMenuSelection">
+				            <iterate
+				                 ifEmpty="false">
+				                 <or>
+				             <instanceof
+                           value="org.eclipse.core.resources.IProject"/>
+                           <instanceof
+                           value="org.eclipse.jdt.core.IJavaProject"/>
+                           </or>
+				            </iterate>
+				           </with>
+         			</visibleWhen>
+            </command>
+            <command
+                  commandId="ch.mlutz.plugins.t4e.commands.addT4eClasspathContainer"
+                  id="ch.mlutz.plugins.t4e.menus.packageexplorer.addT4eClasspathContainer"
+                  mnemonic="C"
+           	      style="toggle">
+ 
+                    <visibleWhen>
+				           <with variable="activeMenuSelection">
+				            <iterate
+				                 ifEmpty="false">
+                           <instanceof
+                           value="org.eclipse.jdt.core.IJavaProject"/>
+				            </iterate>
+				           </with>
+         			</visibleWhen>
+            </command>
+            <command
+                  commandId="ch.mlutz.plugins.t4e.commands.removeT4eClasspathContainer"
+                  id="ch.mlutz.plugins.t4e.menus.packageexplorer.removeT4eClasspathContainer"
+                  mnemonic="R"
+           	      style="toggle">
+ 
+                    <visibleWhen>
+				           <with variable="activeMenuSelection">
+				            <iterate
+				                 ifEmpty="false">
+                           <instanceof
+                           value="org.eclipse.jdt.core.IJavaProject"/>
+				            </iterate>
+				           </with>
+         			</visibleWhen>
+            </command>
+            <command
+                  commandId="ch.mlutz.plugins.t4e.commands.analyzeJavaSourceFile"
+                  id="ch.mlutz.plugins.t4e.menus.packageexplorer.analyzeJavaSourceFile"
+                  mnemonic="A">
+ 
+                    <visibleWhen>
+				           <with variable="activeMenuSelection">
+				            <iterate
+				                 ifEmpty="false">
+				             <adapt type="org.eclipse.core.resources.IResource">
+				               <test property="org.eclipse.core.resources.name" value="*.java" />
+				             </adapt>
+				            </iterate>
+				           </with>
+         			</visibleWhen>
+            </command>
+            </menu>
+      </menuContribution>
+   </extension>
+   
+   <!-- context menu extension to project explorer -->
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu">
+             <separator
+             name="ch.mlutz.plugins.t4e.separator"
+             visible="true">
+       </separator>
+            <menu
+               id="ch.mlutz.plugins.t4e.menus.projectexplorer.tapestry"
+               label="Tapestry">
+            <command
+                  commandId="ch.mlutz.plugins.t4e.commands.refresh"
+                  id="ch.mlutz.plugins.t4e.menus.projectexplorer.refresh"
+                  mnemonic="R">
+ 
+                    <visibleWhen>
+				           <with variable="activeMenuSelection">
+				            <iterate
+				                 ifEmpty="false">
+				             <instanceof
+                           value="org.eclipse.core.resources.IProject"/>
+				            </iterate>
+				           </with>
+         			</visibleWhen>
+            </command>
+            <command
+                  commandId="ch.mlutz.plugins.t4e.commands.refreshAll"
+                  id="ch.mlutz.plugins.t4e.menus.projectexplorer.refreshAll"
+                  mnemonic="A">
+ 
+                    <visibleWhen>
+				           <with variable="activeMenuSelection">
+				            <iterate
+				                 ifEmpty="false">
+				             <instanceof
+                           value="org.eclipse.core.resources.IProject"/>
+				            </iterate>
+				           </with>
+         			</visibleWhen>
+            </command>
+            </menu>
+      </menuContribution>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.startup">
+       <startup class="ch.mlutz.plugins.t4e.handlers.CommandHandler" />
+   </extension>
+   
+   <!--
+	<extension
+       id="ch.mlutz.plugins.t4e.coolmarker"
+       name="CoolMarker"
+       point="org.eclipse.core.resources.markers"/>
+	<extension id="coolproblem" point="org.eclipse.core.resources.markers">
+	   <super type="org.eclipse.core.resources.problemmarker" />
+	   <super type="ch.mlutz.plugins.t4e.coolmarker" />
+	   <attribute name="coolFactor" />
+	   <persistent value="true" />
+	</extension>
+	-->
+	
+	<extension
+      id="ch.mlutz.plugins.t4e.problemmarker" 
+      point="org.eclipse.core.resources.markers" 
+      name="HelloProblem">
+      <super type="org.eclipse.core.resources.problemmarker" />
+      <persistent value="true"/>
+   </extension>
+   <extension
+      id="taskmarker" 
+      point="org.eclipse.core.resources.markers" 
+      name="ch.mlutz.plugins.t4e.hellotask">
+      <super type="org.eclipse.core.resources.marker"/>
+      <persistent value="true"/>
+      <attribute name="priority"/>
+      <attribute name="message"/>
+      <attribute name="done"/>
+      <attribute name="userEditable"/>      
+   </extension>
+   <extension
+      id="bookmark" 
+      point="org.eclipse.core.resources.markers" 
+      name="ch.mlutz.plugins.t4e.hellobookmark">
+      <super type="org.eclipse.core.resources.marker"/>
+      <persistent value="true"/>
+      <attribute name="message"/>
+      <attribute name="location"/>
+   </extension>
+   
+   <extension point="org.eclipse.core.resources.markers"   
+        id="myMarker">
+     <super type="org.eclipse.core.resources.textmarker"/>         
+     <persistent value="true"/>
+  </extension>
+
+<!--
+  <extension point="org.eclipse.ui.editors.annotationTypes">
+     <type
+        super="org.eclipse.ui.workbench.texteditor.warning"
+        markerType="ch.mlutz.plugins.t4e.myMarker"
+        name="ch.mlutz.plugins.t4e.myAnnotation"
+        markerSeverity="1"/>
+  </extension>
+
+  <extension point="org.eclipse.ui.editors.markerAnnotationSpecification">
+     <specification
+        annotationType="ch.mlutz.plugins.t4e.myAnnotation"
+        icon="icons/marker.png"
+        verticalRulerPreferenceKey="myMarkerIndicationInVerticalRuler"
+        verticalRulerPreferenceValue="true"/>
+  </extension>
+  -->
+  <extension point="org.eclipse.jdt.ui.javaCompletionProposalComputer"
+    id="textual_proposals"
+    name="Text Proposals">
+    <proposalCategory icon="icons/wordcompletions.png"/>
+ </extension>
+ <extension point="org.eclipse.jdt.ui.javaCompletionProposalComputer"
+   id="TapestryProposalComputer"
+   name="Tapestry Proposal Computer">
+   <javaCompletionProposalComputer
+      class="ch.mlutz.plugins.t4e.proposalcomputers.TapestryProposalComputer"
+      categoryId="org.eclipse.ui.texteditor.textual_proposals"
+      activate="true">
+      <partition type="__dftl_partition_content_type"/>
+   </javaCompletionProposalComputer>
+ </extension>
+ <extension point="org.eclipse.jdt.ui.javaCompletionProposalComputer"
+   id="TapestryStringProposalComputer"
+   name="Tapestry String Proposal Computer">
+   <javaCompletionProposalComputer
+      class="ch.mlutz.plugins.t4e.proposalcomputers.TapestryStringProposalComputer"
+      categoryId="org.eclipse.ui.texteditor.textual_proposals"
+      activate="true">
+      <partition type="__java_string"/>
+   </javaCompletionProposalComputer>
+ </extension>
+
+ <extension
+          id="ch.mlutz.plugins.t4e.container.T4E_CLASSPATH_CONTAINER"
+          name="%t4e.classpath-container.name"
+          point="org.eclipse.jdt.core.classpathContainerInitializer">
+      <classpathContainerInitializer
+            class="ch.mlutz.plugins.t4e.container.T4eClasspathContainerInitializer"
+            id="ch.mlutz.plugins.t4e.container.T4E_CLASSPATH_CONTAINER"/>
+   </extension>
+      <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            name="Tapestry Editor"
+            extensions="xml"
+            icon="icons/t4e.gif"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            class="ch.mlutz.plugins.t4e.tapestry.editor.TapestryEditor"
+            id="ch.mlutz.plugins.t4e.editors.tapestryEditor">
+      </editor>
+   </extension>
+</plugin>
