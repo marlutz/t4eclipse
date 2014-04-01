@@ -612,8 +612,10 @@ public class TapestryModule implements Serializable {
 				continue;
 			}
 
+			/*
 			log.info("Trying package fragment: "
 					+ fragment.getPath());
+			*/
 
 			compilationUnit= fragment.getCompilationUnit(compilationUnitName);
 			if (compilationUnit != null && compilationUnit.exists()) {
@@ -666,8 +668,10 @@ public class TapestryModule implements Serializable {
 					continue;
 				}
 
+				/*
 				log.info("Trying package fragment: "
 						+ fragment.getPath());
+				*/
 
 				compilationUnit= fragment.getCompilationUnit(resourceName);
 				if (compilationUnit != null && compilationUnit.exists()) {
