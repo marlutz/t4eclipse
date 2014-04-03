@@ -569,7 +569,7 @@ public class TapestryModule implements Serializable {
 		String packageName;
 		String compilationUnitName;
 
-		Pattern pattern= Pattern.compile("(.*\\.)?([^.]+\\.[^.]+)");
+		Pattern pattern= Pattern.compile("(?:(.*)\\.)?([^.]+\\.[^.]+)");
 		Matcher matcher= pattern.matcher(fullyQualifiedName);
 		if (matcher.matches()) {
 			packageName= matcher.group(1);
