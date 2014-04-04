@@ -76,9 +76,7 @@ public class CommandHandler extends AbstractHandler implements IStartup, IExecut
 	/**
 	 * The constructor.
 	 */
-	public CommandHandler() {
-		Activator.getDefault().setHandler(this);
-	}
+	public CommandHandler() {}
 
 	/**
 	 * the command has been executed, so extract extract the needed information
