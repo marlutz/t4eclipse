@@ -35,8 +35,7 @@ import ch.mlutz.plugins.t4e.tools.TapestryTools;
 /**
  * Listener handling resource changes
  */
-public class ResourceChangeListener implements
-	IStartup, IResourceChangeListener {
+public class ResourceChangeListener implements IResourceChangeListener {
 
 	/**
 	 * the Log
@@ -48,17 +47,6 @@ public class ResourceChangeListener implements
 	 * The constructor.
 	 */
 	public ResourceChangeListener() {}
-
-	// IStartup implementation
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IStartup#earlyStartup()
-	 */
-	@Override
-	public void earlyStartup() {
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		workspace.addResourceChangeListener(this);
-	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
