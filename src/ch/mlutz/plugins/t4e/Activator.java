@@ -106,6 +106,7 @@ public class Activator extends AbstractUIPlugin {
 			}
 		}
 
+		/*
 		// attach popup menu handler
 		MenuManager manager = new MenuManager("#PopupMenu");
 		manager.setRemoveAllWhenShown(true);
@@ -115,9 +116,10 @@ public class Activator extends AbstractUIPlugin {
 			   /*
 			   final IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
 			   boolean isEntityGroupSelected = OwlUI.isEntityGroupSelected(selection);
-			   */
+			   * /
 			}
 		});
+		*/
 	}
 
 	/*
