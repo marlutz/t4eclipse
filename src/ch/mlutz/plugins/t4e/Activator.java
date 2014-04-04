@@ -25,18 +25,17 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import ch.mlutz.plugins.t4e.constants.Constants;
-import ch.mlutz.plugins.t4e.handlers.CommandHandler;
+import ch.mlutz.plugins.t4e.handlers.ResourceChangeListener;
 import ch.mlutz.plugins.t4e.index.TapestryIndex;
 import ch.mlutz.plugins.t4e.index.TapestryIndexer;
 import ch.mlutz.plugins.t4e.log.EclipseLogFactory;
@@ -57,6 +56,8 @@ public class Activator extends AbstractUIPlugin {
 
 	private static Map<ImageDescriptor, Image> imageCache= new HashMap<ImageDescriptor, Image>();
 
+	private ResourceChangeListener resourceChangeListener= null;
+
 	private TapestryIndex tapestryIndex= null;
 
 	private TapestryIndexer tapestryIndexer= null;
@@ -75,10 +76,12 @@ public class Activator extends AbstractUIPlugin {
 		super.start(context);
 
 		plugin= this;
-
 		EclipseLogFactory.setLog(getLog());
-
 		log= EclipseLogFactory.create(Activator.class);
+
+		resourceChangeListener= new ResourceChangeListener();
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		workspace.addResourceChangeListener(resourceChangeListener);
 
 		// try to load tapestryIndex from plugin state
 		IPath pluginStateLocation= getStateLocation();
@@ -153,16 +156,10 @@ public class Activator extends AbstractUIPlugin {
 			}
 		}
 
-		/*
-		 * try {
-
-   java.io.File file =
-	  new java.io.File(Activator.getDefault().getStateLocation().toFile(), filename);
-
-} catch(Exception e) {
-   e.printStackTrace();
-}
-		 */
+		if (resourceChangeListener != null) {
+			IWorkspace workspace = ResourcesPlugin.getWorkspace();
+			workspace.removeResourceChangeListener(resourceChangeListener);
+		}
 
 		super.stop(context);
 	}
