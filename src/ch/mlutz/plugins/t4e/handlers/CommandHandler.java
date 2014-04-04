@@ -464,30 +464,6 @@ public class CommandHandler extends AbstractHandler implements IStartup, IExecut
 		return Activator.getDefault().getLog();
 	}
 
-	public void logMessage(String s) {
-		getLog().log(new Status(Status.INFO, Constants.PLUGIN_ID, Status.OK, s, null));
-	}
-
-	public void logMessage(String s, Throwable exception) {
-		getLog().log(new Status(Status.INFO, Constants.PLUGIN_ID, Status.OK, s, exception));
-	}
-
-	public void logWarning(String s) {
-		getLog().log(new Status(Status.WARNING, Constants.PLUGIN_ID, Status.OK, s, null));
-	}
-
-	public void logWarning(String s, Throwable exception) {
-		getLog().log(new Status(Status.WARNING, Constants.PLUGIN_ID, Status.OK, s, exception));
-	}
-
-	public void logError(String s) {
-		getLog().log(new Status(Status.ERROR, Constants.PLUGIN_ID, Status.OK, s, null));
-	}
-
-	public void logError(String s, Throwable exception) {
-		getLog().log(new Status(Status.ERROR, Constants.PLUGIN_ID, Status.OK, s, exception));
-	}
-
 	public TapestryIndex getTapestryIndex() {
 		return Activator.getDefault().getTapestryIndex();
 	}
