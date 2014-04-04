@@ -57,8 +57,6 @@ public class Activator extends AbstractUIPlugin {
 
 	private static Map<ImageDescriptor, Image> imageCache= new HashMap<ImageDescriptor, Image>();
 
-	private CommandHandler handler;
-
 	private TapestryIndex tapestryIndex= null;
 
 	private TapestryIndexer tapestryIndexer= null;
@@ -176,14 +174,6 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static Activator getDefault() {
 		return plugin;
-	}
-
-	public CommandHandler getHandler() {
-		return handler;
-	}
-
-	public void setHandler(CommandHandler handler) {
-		this.handler= handler;
 	}
 
 	/**
