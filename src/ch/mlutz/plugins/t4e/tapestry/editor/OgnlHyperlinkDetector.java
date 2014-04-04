@@ -159,7 +159,7 @@ outer:
 						}
 
 						ognlMethodName= ognlMethodName
-								.replaceAll("^get(.+)\\(\\)$", "$1");
+								.replaceAll("^(?:get|is)(.+)\\(\\)$", "$1");
 						// TODO: check this match!
 						if (ognlMethodName.equalsIgnoreCase(hyperlinkText)) {
 							methodMatch= method;
