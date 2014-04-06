@@ -294,6 +294,15 @@ public class TapestryIndex implements Serializable {
 		appSpecificationMap.clear();
 		componentClassPackageMap.clear();
 		pageClassPackageMap.clear();
+
+		// NEW INFRASTRUCTURE
+		projects.clear();
+		relationMap.clear();
+		relationToCompilationUnit.clear();
+		webappFolderMap.clear();
+		modules.clear();
+		documentToFileMap.clear();
+		standardComponents.clear();
 	}
 
 	public void clear(IProject project) {
