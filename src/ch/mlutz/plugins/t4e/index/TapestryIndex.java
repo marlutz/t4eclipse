@@ -50,12 +50,15 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.IDocument;
 
+import ch.mlutz.plugins.t4e.log.EclipseLogFactory;
+import ch.mlutz.plugins.t4e.log.IEclipseLog;
 import ch.mlutz.plugins.t4e.serializer.EclipseSerializer;
 import ch.mlutz.plugins.t4e.tapestry.TapestryModule;
 import ch.mlutz.plugins.t4e.tapestry.element.IComponent;
 import ch.mlutz.plugins.t4e.tapestry.element.StandardComponent;
 import ch.mlutz.plugins.t4e.tapestry.parsers.AppSpecificationParser;
 import ch.mlutz.plugins.t4e.tapestry.parsers.SpecificationParser;
+
 import java.util.Collections;
 
 /**
@@ -66,6 +69,12 @@ import java.util.Collections;
  * @author Marcel Lutz
  */
 public class TapestryIndex implements Serializable {
+
+	/**
+	 * the Log
+	 */
+	public static final IEclipseLog log= EclipseLogFactory.create(
+			TapestryIndex.class);
 
 	// TODO: move index functionality down to class TapestryModule
 
