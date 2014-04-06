@@ -48,17 +48,18 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
-import org.omg.CORBA.Request;
 
 import ch.mlutz.plugins.t4e.Activator;
+import ch.mlutz.plugins.t4e.index.ITapestryModuleChangeListener;
 import ch.mlutz.plugins.t4e.index.TapestryIndex;
+import ch.mlutz.plugins.t4e.index.TapestryIndexer;
 import ch.mlutz.plugins.t4e.log.EclipseLogFactory;
 import ch.mlutz.plugins.t4e.log.IEclipseLog;
 import ch.mlutz.plugins.t4e.serializer.EclipseSerializer;
-import ch.mlutz.plugins.t4e.tapestry.element.TapestryElement;
 import ch.mlutz.plugins.t4e.tapestry.element.ElementType;
-import ch.mlutz.plugins.t4e.tapestry.element.TapestryHtmlElement;
 import ch.mlutz.plugins.t4e.tapestry.element.Service;
+import ch.mlutz.plugins.t4e.tapestry.element.TapestryElement;
+import ch.mlutz.plugins.t4e.tapestry.element.TapestryHtmlElement;
 import ch.mlutz.plugins.t4e.tapestry.parsers.SpecificationParser;
 import ch.mlutz.plugins.t4e.tools.TapestryTools;
 
@@ -96,19 +97,20 @@ public class TapestryModule implements Serializable {
 	 */
 	private transient IContainer webappFolder;
 
-	private Set<TapestryHtmlElement> components= new HashSet<TapestryHtmlElement>();
+
 
 	public Set<TapestryHtmlElement> getComponents() {
 		return Collections.unmodifiableSet(components);
 	}
 
-	private List<TapestryElement> elements= new ArrayList<TapestryElement>();
-
-	private Set<TapestryHtmlElement> pages= new HashSet<TapestryHtmlElement>();
-
-	private transient Set<Service> services= new HashSet<Service>();
+	private Set<TapestryHtmlElement> components;
+	private List<TapestryElement> elements;
+	private Set<TapestryHtmlElement> pages;
+	private Set<Service> services;
 
 	private transient TapestryIndex tapestryIndexStore;
+
+	private transient ITapestryModuleChangeListener changeListener;
 
 	/**
 	 * Constructor
@@ -116,12 +118,26 @@ public class TapestryModule implements Serializable {
 	 * @param appSpecificationFile the modules app specification file
 	 * @throws TapestryException if the project structure is not correct
 	 */
-	public TapestryModule(IFile appSpecificationFile) throws TapestryException {
+	public TapestryModule(IFile appSpecificationFile,
+			ITapestryModuleChangeListener changeListener)
+			throws TapestryException {
+
+		initializeCollections();
 
 		validateAppSpecificationFile(appSpecificationFile);
 
 		appSpecification= new AppSpecification(appSpecificationFile);
+
+		setChangeListener(changeListener);
 	}
+
+	private void initializeCollections() {
+		components= new HashSet<TapestryHtmlElement>();
+		elements= new ArrayList<TapestryElement>();
+		pages= new HashSet<TapestryHtmlElement>();
+		services= new HashSet<Service>();
+	}
+
 
 	@Override
 	public int hashCode() {
@@ -175,6 +191,7 @@ public class TapestryModule implements Serializable {
 		return hiveModuleDescriptor;
 	}
 
+	/*
 	public void addElementsToTapestryIndex() {
 		for (TapestryHtmlElement htmlElement: components) {
 			for (Pair<IFile, IFile> relation: htmlElement.getRelations()) {
@@ -194,6 +211,7 @@ public class TapestryModule implements Serializable {
 			}
 		}
 	}
+	*/
 
 	public void add(TapestryElement element) {
 		TapestryHtmlElement htmlElement;
@@ -201,28 +219,35 @@ public class TapestryModule implements Serializable {
 			case COMPONENT:
 				htmlElement= (TapestryHtmlElement) element;
 				components.add(htmlElement);
+				/*
 				for (Pair<IFile, IFile> relation: htmlElement.getRelations()) {
 					getTapestryIndex().addBidiRelation(relation.getLeft(),
 						relation.getRight());
 				}
 				getTapestryIndex().addRelationToCompilationUnit(
 					htmlElement.getHtmlFile(), htmlElement.getJavaCompilationUnit());
+				*/
 				break;
 			case PAGE:
 				htmlElement= (TapestryHtmlElement) element;
 				pages.add(htmlElement);
+				/*
 				for (Pair<IFile, IFile> relation: htmlElement.getRelations()) {
 					getTapestryIndex().addBidiRelation(relation.getLeft(),
 						relation.getRight());
 				}
 				getTapestryIndex().addRelationToCompilationUnit(
 					htmlElement.getHtmlFile(), htmlElement.getJavaCompilationUnit());
+				*/
 				break;
 			case SERVICE:
 				services.add((Service) element);
 				break;
 			default:
 				elements.add(element);
+		}
+		if (changeListener != null) {
+			changeListener.elementAdded(this, element);
 		}
 	}
 
@@ -239,6 +264,9 @@ public class TapestryModule implements Serializable {
 				break;
 			default:
 				elements.remove(element);
+		}
+		if (changeListener != null) {
+			changeListener.elementRemoved(this, element);
 		}
 	}
 
@@ -536,7 +564,7 @@ public class TapestryModule implements Serializable {
 
 		if (targetQualifiedClassName == null
 				|| "".equals(targetQualifiedClassName)) {
-			log.warn("targetQualifiedClassName in specification is null or empty.");
+			log.warn("targetQualifiedClassName in specification " + file.getName() + " is null or empty.");
 			return null;
 		}
 
@@ -703,6 +731,7 @@ public class TapestryModule implements Serializable {
 	private void readObject(java.io.ObjectInputStream stream)
 			throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();
+
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		webappFolder= EclipseSerializer.deserializeResource(stream, workspaceRoot, IContainer.class);
 
@@ -713,5 +742,55 @@ public class TapestryModule implements Serializable {
 		for (TapestryHtmlElement page: pages) {
 			page.setParent(this);
 		}
+
+		setChangeListener(Activator.getDefault().getTapestryIndexer());
+	}
+
+	/**
+	 * @return the changeListener
+	 */
+	public ITapestryModuleChangeListener getChangeListener() {
+		return changeListener;
+	}
+
+	/**
+	 * @param changeListener the changeListener to set
+	 */
+	public void setChangeListener(ITapestryModuleChangeListener changeListener) {
+		if (this.changeListener == changeListener) {
+			return;
+		}
+
+		List<Set<? extends TapestryElement>> listOfElementSets=
+				getListOfElementSets();
+
+		// remove all elements from old change listener
+		if (this.changeListener != null) {
+			for (Set<? extends TapestryElement> set: listOfElementSets) {
+				for (TapestryElement element: set) {
+					this.changeListener.elementRemoved(this, element);
+				}
+			}
+		}
+
+		// add all elements to new change listener
+		if (changeListener != null) {
+			for (Set<? extends TapestryElement> set: listOfElementSets) {
+				for (TapestryElement element: set) {
+					changeListener.elementAdded(this, element);
+				}
+			}
+		}
+
+		this.changeListener= changeListener;
+	}
+
+	private List<Set<? extends TapestryElement>> getListOfElementSets() {
+		List<Set<? extends TapestryElement>> result=
+				new ArrayList<Set<? extends TapestryElement>>();
+		result.add(components);
+		result.add(pages);
+		result.add(services);
+		return result;
 	}
 }

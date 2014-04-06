@@ -114,8 +114,10 @@ public class TapestryHtmlElement extends TapestryElement
 		return type;
 	}
 
-	public List<Pair<IFile, IFile>> getRelations() {
-		List<Pair<IFile, IFile>> result= new ArrayList<Pair<IFile, IFile>>();
+	public List<Pair<IFile, Object>> getRelations() {
+		List<Pair<IFile, Object>> result= new ArrayList<Pair<IFile, Object>>();
+
+		/*
 		IFile javaFile= null;
 
 		if (javaCompilationUnit != null) {
@@ -131,13 +133,17 @@ public class TapestryHtmlElement extends TapestryElement
 		}
 
 		if (javaFile != null) {
-			result.add(new ImmutablePair<IFile, IFile>(htmlFile,
-					javaFile));
-			if (specification != null) {
-				result.add(new ImmutablePair<IFile, IFile>(specification,
-						javaFile));
-			}
+
+		*/
+
+		result.add(new ImmutablePair<IFile, Object>(htmlFile,
+				javaCompilationUnit));
+		if (specification != null) {
+			result.add(new ImmutablePair<IFile, Object>(specification,
+					javaCompilationUnit));
 		}
+
+		/* } */
 
 		return result;
 	}

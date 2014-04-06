@@ -32,7 +32,7 @@ public abstract class TapestryElement implements Serializable {
 
 	public abstract ElementType getType();
 
-	public List<Pair<IFile, IFile>> getRelations() {
+	public List<Pair<IFile, Object>> getRelations() {
 		return null;
 	}
 }

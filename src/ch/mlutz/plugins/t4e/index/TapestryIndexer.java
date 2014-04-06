@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -33,6 +34,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 
@@ -41,6 +44,8 @@ import ch.mlutz.plugins.t4e.log.EclipseLogFactory;
 import ch.mlutz.plugins.t4e.log.IEclipseLog;
 import ch.mlutz.plugins.t4e.tapestry.TapestryException;
 import ch.mlutz.plugins.t4e.tapestry.TapestryModule;
+import ch.mlutz.plugins.t4e.tapestry.element.TapestryElement;
+import ch.mlutz.plugins.t4e.tapestry.element.TapestryHtmlElement;
 import ch.mlutz.plugins.t4e.tools.EclipseTools;
 
 /**
@@ -49,7 +54,7 @@ import ch.mlutz.plugins.t4e.tools.EclipseTools;
  *
  * @author Marcel Lutz
  */
-public class TapestryIndexer {
+public class TapestryIndexer implements ITapestryModuleChangeListener {
 
 	private static final int PROGRESS_MONITOR_MULTIPLIER= 100;
 	private static final int DEBUG_SLEEP_MS= 0;
@@ -230,7 +235,8 @@ public class TapestryIndexer {
 		while ((currentFile= appSpecificationFiles.poll()) != null) {
 
 			try {
-				TapestryModule tapestryModule= new TapestryModule(currentFile);
+				TapestryModule tapestryModule= new TapestryModule(currentFile,
+						this);
 				result.add(tapestryModule);
 			} catch (TapestryException e) {
 				log.warn("Couldn't validate tapestryModule for app specification"
@@ -288,7 +294,9 @@ public class TapestryIndexer {
 							public void run() {
 								IFile target= getRelatedFile(
 									finalSwitchToRelatedFile);
-								switchToFile(target, finalActivePage);
+								if (target != null) {
+									switchToFile(target, finalActivePage);
+								}
 							}
 						});
 					}
@@ -352,26 +360,67 @@ public class TapestryIndexer {
 	 */
 	public synchronized IFile getRelatedFile(IFile file) {
 		IFile target= null;
-		Set<IFile> toFiles= tapestryIndex.getRelatedFiles(file);
-		if (toFiles.size() > 0) {
-			for (IFile toFile: toFiles) {
-
-				// use first file as default
-				if (target == null) {
-					target= toFile;
-				}
+		Set<Object> toSet= tapestryIndex.getRelatedObjects(file);
+		if (toSet.size() > 0) {
+			for (Object toFile: toSet) {
 
 				// prefer html/java files
+				boolean isPreferred= false;
 				try {
-					if (isHtmlFile(toFile) || isJavaFile(toFile)) {
-						target= toFile;
-						break;
-					}
+					isPreferred= (toFile instanceof IFile && isHtmlFile((IFile) toFile))
+							|| toFile instanceof ICompilationUnit;
 				} catch(CoreException e) {
 					log.warn("Couldn't check toFile if it is Html or Java.", e);
+				}
+
+				// use first file as default
+				if (isPreferred || target == null) {
+					try {
+						if (toFile instanceof IFile) {
+							target= (IFile) toFile;
+						} else if (toFile instanceof ICompilationUnit) {
+							target= (IFile) ((ICompilationUnit) toFile)
+									.getCorrespondingResource().getAdapter(IFile.class);
+						}
+
+						if (isPreferred) {
+							break;
+						}
+					} catch (JavaModelException e) {
+						log.warn("Couldn't get corresponding resource for "
+								+ "ICompilationUnit: ", e);
+					}
 				}
 			}
 		}
 		return target;
+	}
+
+
+	@Override
+	public void elementAdded(TapestryModule tapestryModule,
+			TapestryElement element) {
+		TapestryHtmlElement htmlElement;
+		switch (element.getType()) {
+			case COMPONENT:
+			case PAGE:
+				htmlElement= (TapestryHtmlElement) element;
+				for (Pair<IFile, Object> relation: htmlElement.getRelations()) {
+					tapestryIndex.addBidiRelation(relation.getLeft(),
+						relation.getRight());
+				}
+				tapestryIndex.addRelationToCompilationUnit(
+					htmlElement.getHtmlFile(), htmlElement.getJavaCompilationUnit());
+				break;
+			default:
+		}
+	}
+
+
+	@Override
+	public void elementRemoved(TapestryModule tapestryModule,
+			TapestryElement tapestryElement) {
+		// TODO Auto-generated method stub
+
 	}
 }

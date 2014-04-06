@@ -383,8 +383,6 @@ public class TapestryIndex implements Serializable {
 
 		// postprocessing
 		for (TapestryModule module: modules) {
-			module.setTapestryIndex(this);
-			module.addElementsToTapestryIndex();
 			webappFolderMap.put(module.getWebappFolder(), module);
 		}
 	}
@@ -458,20 +456,33 @@ public class TapestryIndex implements Serializable {
 		return webappFolderMap.get(container);
 	}
 
-	public synchronized void addBidiRelation(IFile file1, IFile file2) {
-		addRelation(file1, file2);
-		addRelation(file2, file1);
+	public synchronized void addBidiRelation(IFile file1, Object object) {
+		if (object instanceof IFile) {
+			addRelation(file1, object);
+			addRelation((IFile) object, file1);
+		} else if (object instanceof ICompilationUnit) {
+			addRelation(file1, object);
+			try {
+				addRelation((IFile) ((ICompilationUnit) object)
+						.getCorrespondingResource().getAdapter(IFile.class),
+						file1);
+			} catch (JavaModelException e) {
+				log.warn("Couldn't get corresponding resource of compilation "
+						+ "unit " + ((ICompilationUnit) object).getElementName(), e);
+			}
+		}
 	}
 
-	public synchronized void addRelation(IFile from, IFile to) {
+	public synchronized void addRelation(IFile from, Object to) {
 		Object existingTo= relationMap.get(from);
 		if (existingTo == null) {
 			relationMap.put(from, to);
 		} else {
 			if (!(existingTo instanceof Set)) {
-				Set<IFile> toSet= new HashSet<IFile>();
-				if (existingTo instanceof IFile) {
-					toSet.add((IFile) existingTo);
+				Set<Object> toSet= new HashSet<Object>();
+				if (existingTo instanceof IFile
+						|| existingTo instanceof ICompilationUnit) {
+					toSet.add(existingTo);
 				}
 				existingTo= toSet;
 				relationMap.put(from, existingTo);
@@ -479,7 +490,7 @@ public class TapestryIndex implements Serializable {
 
 			// existingTo is definitely Set<IFile>
 			@SuppressWarnings("unchecked")
-			Set<IFile> toSet= (Set<IFile>) existingTo;
+			Set<Object> toSet= (Set<Object>) existingTo;
 			toSet.add(to);
 		}
 	}
@@ -499,15 +510,15 @@ public class TapestryIndex implements Serializable {
 	 * @param file
 	 * @return
 	 */
-	public synchronized Set<IFile> getRelatedFiles(IFile file) {
+	public synchronized Set<Object> getRelatedObjects(IFile file) {
 		Object to= relationMap.get(file);
-		Set<IFile> result= new HashSet<IFile>();
-		if (to instanceof IFile) {
-			result.add((IFile) to);
+		Set<Object> result= new HashSet<Object>();
+		if (to instanceof IFile || to instanceof ICompilationUnit) {
+			result.add(to);
 			return result;
 		} else if (to instanceof Set) {
 			@SuppressWarnings("unchecked")
-			Set<IFile> toSet= (Set<IFile>) to;
+			Set<Object> toSet= (Set<Object>) to;
 			return toSet;
 		} else {
 			return result;
@@ -555,6 +566,8 @@ public class TapestryIndex implements Serializable {
 		*/
 	}
 
+	// the following three methods are used by TapestryDocumentProvider and
+	// TapestryEditor
 	public synchronized void addDocumentToFileMapping(IDocument document, IFile file) {
 		documentToFileMap.put(document, file);
 	}
