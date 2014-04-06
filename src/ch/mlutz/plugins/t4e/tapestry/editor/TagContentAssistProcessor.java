@@ -180,6 +180,7 @@ public class TagContentAssistProcessor implements IContentAssistProcessor {
 			}
 		}
 
+		/*
 		try
 		{
 			ITypedRegion typedRegion= document.getPartition(offset);
@@ -205,6 +206,7 @@ public class TagContentAssistProcessor implements IContentAssistProcessor {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		*/
 
 		return result.toArray(new ICompletionProposal[result.size()]);
 	}
