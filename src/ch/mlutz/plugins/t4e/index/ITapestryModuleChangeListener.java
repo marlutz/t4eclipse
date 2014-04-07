@@ -22,18 +22,18 @@ public interface ITapestryModuleChangeListener {
 	/**
 	 * Called after a tapestry element is added to the module.
 	 *
-	 * @param tapestryModule
-	 * @param tapestryElement
+	 * @param module
+	 * @param element
 	 */
 	public abstract void elementAdded(
-			TapestryModule tapestryModule, TapestryElement tapestryElement);
+			TapestryModule module, TapestryElement element);
 
 	/**
 	 * Called before a tapestry element is removed from the module
 	 *
-	 * @param tapestryModule
-	 * @param tapestryElement
+	 * @param module
+	 * @param element
 	 */
 	public abstract void elementRemoved (
-			TapestryModule tapestryModule, TapestryElement tapestryElement);
+			TapestryModule module, TapestryElement element);
 }
