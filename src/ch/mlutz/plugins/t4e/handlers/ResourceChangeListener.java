@@ -20,16 +20,16 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ui.IStartup;
 
 import ch.mlutz.plugins.t4e.Activator;
 import ch.mlutz.plugins.t4e.index.TapestryIndex;
 import ch.mlutz.plugins.t4e.index.TapestryIndexer;
 import ch.mlutz.plugins.t4e.log.EclipseLogFactory;
 import ch.mlutz.plugins.t4e.log.IEclipseLog;
+import ch.mlutz.plugins.t4e.tapestry.TapestryException;
+import ch.mlutz.plugins.t4e.tapestry.TapestryModule;
+import ch.mlutz.plugins.t4e.tapestry.element.TapestryHtmlElement;
 import ch.mlutz.plugins.t4e.tools.TapestryTools;
 
 /**
@@ -64,11 +64,22 @@ public class ResourceChangeListener implements IResourceChangeListener {
 			synchronized(tapestryIndex) {
 				for (IFile file: files) {
 					if (TapestryTools.isComponentSpecification(file)) {
-						// tapestryIndex.handleComponentSpecification(file);
+						handleComponentSpecification(tapestryIndex, file);
 					} else if (TapestryTools.isPageSpecification(file)) {
-						// tapestryIndex.handlePageSpecification(file);
+						handlePageSpecification(tapestryIndex, file);
 					} else if (TapestryTools.isAppSpecification(file)) {
-						// tapestryIndex.handleAppSpecification(file);
+						TapestryModule module= tapestryIndex
+							.getModuleForResource(file);
+						module.clear();
+						tapestryIndex.remove(module);
+
+						try {
+							module= new TapestryModule(file, Activator.getDefault()
+								.getTapestryIndexer());
+						} catch(TapestryException e) {
+							log.warn("Could not create TapestryModule from "
+								+ "file " + file.getName(), e);
+						}
 					}
 				}
 
@@ -169,7 +180,6 @@ public class ResourceChangeListener implements IResourceChangeListener {
 			if (logOtherChanges) {
 				System.out.println("Pre-Close event!" + " " + event.getResource().getName());
 			}
-
 		} else {
 			log.info("ResourceChanged: " + event.getType());
 
@@ -197,6 +207,67 @@ public class ResourceChangeListener implements IResourceChangeListener {
 		// System.out.println("Something changed!" + arg0.getType() + " " + arg0.toString() + " " + arg0.getResource());
 	}
 
+	private void handleComponentSpecification(TapestryIndex tapestryIndex,
+			IFile file) {
+		TapestryModule module= tapestryIndex.getModuleForResource(file);
+		TapestryHtmlElement element= module.findComponentForSpecification(file);
+		if (element != null) {
+			module.remove(element);
+
+		}
+	}
+
+	private void htmlFileAdded(IFile htmlFile, TapestryIndex tapestryIndex) {
+		TapestryModule module= tapestryIndex.getModuleForResource(htmlFile);
+		htmlFileAdded(htmlFile, module, tapestryIndex);
+	}
+
+	private void htmlFileAdded(IFile htmlFile, TapestryModule module,
+			TapestryIndex tapestryIndex) {
+		if (htmlFile != null) {
+			try {
+				module.findRelatedFile(htmlFile);
+			} catch (CoreException e) {
+				log.warn("CoreException in ResourceChangeListener: ", e);
+			}
+		}
+	}
+
+	private void htmlFileRemoved(IFile htmlFile, TapestryIndex tapestryIndex) {
+		TapestryModule module= tapestryIndex.getModuleForResource(htmlFile);
+		htmlFileRemoved(htmlFile, module, tapestryIndex);
+	}
+
+	private void htmlFileRemoved(IFile htmlFile, TapestryModule module,
+			TapestryIndex tapestryIndex) {
+		TapestryHtmlElement htmlElement= module.findHtmlElementForHtmlFile(
+				htmlFile);
+
+		if (htmlFile != null) {
+			try {
+				module.findRelatedFile(htmlFile);
+			} catch (CoreException e) {
+				log.warn("CoreException in ResourceChangeListener: ", e);
+			}
+		}
+	}
+
+	private void handlePageSpecification(TapestryIndex tapestryIndex,
+			IFile file) {
+		TapestryModule module= tapestryIndex.getModuleForResource(file);
+		TapestryHtmlElement element= module.findPageForSpecification(file);
+		if (element != null) {
+			module.remove(element);
+			IFile htmlFile= element.getHtmlFile();
+			if (htmlFile != null) {
+				try {
+					module.findRelatedFile(htmlFile);
+				} catch (CoreException e) {
+					log.warn("CoreException in ResourceChangeListener: ", e);
+				}
+			}
+		}
+	}
 	private List<IProject> getProjects(IResourceDelta delta, final int changeTypeMask) {
 		final List<IProject> projects = new ArrayList<IProject>();
 		try {
