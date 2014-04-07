@@ -94,7 +94,7 @@ public class TapestryIndexer implements ITapestryModuleChangeListener {
 	public void update(IResource enclosedResource) throws CoreException {
 		checkForProgressMonitorCancel();
 		if (enclosedResource instanceof IFile) {
-			update((IFile) enclosedResource);
+			update(enclosedResource);
 		} else if (enclosedResource instanceof IContainer) {
 			update((IContainer) enclosedResource);
 		} else if (enclosedResource instanceof IWorkspaceRoot) {
@@ -398,7 +398,7 @@ public class TapestryIndexer implements ITapestryModuleChangeListener {
 
 
 	@Override
-	public void elementAdded(TapestryModule tapestryModule,
+	public void elementAdded(TapestryModule module,
 			TapestryElement element) {
 		TapestryHtmlElement htmlElement;
 		switch (element.getType()) {
@@ -409,8 +409,10 @@ public class TapestryIndexer implements ITapestryModuleChangeListener {
 					tapestryIndex.addBidiRelation(relation.getLeft(),
 						relation.getRight());
 				}
+				/*
 				tapestryIndex.addRelationToCompilationUnit(
 					htmlElement.getHtmlFile(), htmlElement.getJavaCompilationUnit());
+					*/
 				break;
 			default:
 		}
@@ -418,9 +420,35 @@ public class TapestryIndexer implements ITapestryModuleChangeListener {
 
 
 	@Override
-	public void elementRemoved(TapestryModule tapestryModule,
-			TapestryElement tapestryElement) {
-		// TODO Auto-generated method stub
+	public void elementRemoved(TapestryModule module,
+			TapestryElement element) {
+		TapestryHtmlElement htmlElement;
+	    switch (element.getType()) {
+	        case COMPONENT:
+	        case PAGE:
+	            htmlElement= (TapestryHtmlElement) element;
+	            for (Pair<IFile, Object> relation: htmlElement.getRelations()) {
+	                tapestryIndex.addBidiRelation(relation.getLeft(),
+	                    relation.getRight());
+	            }
+	            /*
+	            tapestryIndex.addRelationToCompilationUnit(
+	                htmlElement.getHtmlFile(), htmlElement.getJavaCompilationUnit());
+	            */
+	            break;
+	        default:
+	    }
+	}
 
+	public static IFile getCorrespondingFileForCompilationUnit(
+			ICompilationUnit compilationUnit)  {
+		try {
+		    return (IFile) compilationUnit
+		        .getCorrespondingResource().getAdapter(IFile.class);
+		} catch(JavaModelException e) {
+		    log.warn("Could not get corresponding resource for compilation"
+		        + " unit " + compilationUnit.getElementName(), e);
+		}
+		return null;
 	}
 }
