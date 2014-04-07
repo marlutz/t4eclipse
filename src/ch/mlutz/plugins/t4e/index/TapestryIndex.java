@@ -504,14 +504,27 @@ public class TapestryIndex implements Serializable {
 		}
 	}
 
+	/*
 	public synchronized void addRelationToCompilationUnit(IFile from,
 			ICompilationUnit compilationUnit) {
 		relationToCompilationUnit.put(from, compilationUnit);
 	}
+	*/
 
 	public synchronized ICompilationUnit getRelatedCompilationUnit(IFile file) {
-		return relationToCompilationUnit.get(file);
+		Set<Object> relatedObjects= getRelatedObjects(file);
+		if (relatedObjects == null) {
+		    return null;
+		}
+
+		for (Object relatedObject: relatedObjects) {
+		    if (relatedObject instanceof ICompilationUnit) {
+		        return (ICompilationUnit) relatedObject;
+		    }
+		}
+		return null;
 	}
+
 
 	/**
 	 * Always returns a set (possibly empty)
@@ -560,19 +573,56 @@ public class TapestryIndex implements Serializable {
 	}
 	*/
 
-	public synchronized void removeRelation(IFile from, IFile to) {
-		relationMap.remove(from);
+	public synchronized void removeRelationsFrom(Object from) {
+		if (from instanceof IFile) {
+		    relationMap.remove(from);
+		} else if (from instanceof ICompilationUnit) {
+		    try {
+	            IFile javaFile= (IFile) ((ICompilationUnit) from)
+	                .getCorrespondingResource().getAdapter(IFile.class);
+	            relationMap.remove(javaFile);
+	        } catch(JavaModelException e) {
+	            log.warn("Could not get corresponding resource from compilation"
+	                + " unit " + ((ICompilationUnit) from).getElementName(), e);
+	        }
+
+		}
 	}
 
-	public synchronized void removeBidiRelation(IFile from, IFile to) {
-		// TODO: implement
-		/*
-		IFile relatedFile= relationMap.get(from);
-		if (relatedFile != null) {
-			relationMap.remove(relatedFile);
+	public synchronized void removeRelationsTo(Object to) {
+		IFile toFile= null;
+		if (to instanceof IFile) {
+			toFile= (IFile) to;
+		} else if (to instanceof ICompilationUnit) {
+			toFile= TapestryIndexer.getCorrespondingFileForCompilationUnit(
+					(ICompilationUnit) to);
 		}
-		relationMap.remove(from);
-		*/
+
+		if (to != null) {
+			Set<Object> fromSet= getRelatedObjects(toFile);
+
+			for (Object from: fromSet) {
+				IFile fromFile= null;
+
+				if (from instanceof IFile) {
+					fromFile= (IFile) from;
+				} else if (from instanceof ICompilationUnit) {
+					fromFile= TapestryIndexer
+							.getCorrespondingFileForCompilationUnit(
+									(ICompilationUnit) from);
+			    }
+
+				if (fromFile != null) {
+					Set<Object> toSet= getRelatedObjects(fromFile);
+
+					if (toSet.size() == 1 && toSet.contains(to)) {
+						relationMap.remove(fromFile);
+					} else {
+						toSet.remove(to);
+					}
+				}
+			}
+		}
 	}
 
 	// the following three methods are used by TapestryDocumentProvider and
