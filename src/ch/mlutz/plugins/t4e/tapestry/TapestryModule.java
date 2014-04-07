@@ -116,6 +116,7 @@ public class TapestryModule implements Serializable {
 	 * Constructor
 	 *
 	 * @param appSpecificationFile the modules app specification file
+	 * @param changeListener
 	 * @throws TapestryException if the project structure is not correct
 	 */
 	public TapestryModule(IFile appSpecificationFile,
@@ -267,6 +268,21 @@ public class TapestryModule implements Serializable {
 		}
 		if (changeListener != null) {
 			changeListener.elementRemoved(this, element);
+		}
+	}
+
+	/**
+	 * Removes all Tapestry elements from this module; methods cascadingly
+	 * removes its elements from Tapestry index.
+	 */
+	public void clear() {
+		List<Set<? extends TapestryElement>> listOfElementSets=
+			getListOfElementSets();
+		for (Set<? extends TapestryElement> set: listOfElementSets) {
+			for (TapestryElement element: set) {
+				this.changeListener.elementRemoved(this, element);
+			}
+			set.clear();
 		}
 	}
 
@@ -719,6 +735,41 @@ public class TapestryModule implements Serializable {
 			tapestryIndexStore= Activator.getDefault().getTapestryIndex();
 		}
 		return tapestryIndexStore;
+	}
+
+	public TapestryHtmlElement findComponentForSpecification(
+			IFile specification) {
+		for (TapestryHtmlElement component: components) {
+			if (specification.equals(component.getSpecification())) {
+				return component;
+			}
+		}
+		return null;
+	}
+
+	public TapestryHtmlElement findPageForSpecification(
+			IFile specification) {
+		for (TapestryHtmlElement page: pages) {
+			if (specification.equals(page.getSpecification())) {
+				return page;
+			}
+		}
+		return null;
+	}
+
+	public TapestryHtmlElement findHtmlElementForHtmlFile(
+			IFile htmlFile) {
+		for (TapestryHtmlElement page: pages) {
+			if (htmlFile.equals(page.getHtmlFile())) {
+				return page;
+			}
+		}
+		for (TapestryHtmlElement component: components) {
+			if (htmlFile.equals(component.getHtmlFile())) {
+				return component;
+			}
+		}
+		return null;
 	}
 
 	// serialization
