@@ -122,8 +122,8 @@ public class AppSpecification implements Serializable {
 		stream.defaultReadObject();
 
 		IWorkspaceRoot workspaceRoot= ResourcesPlugin.getWorkspace().getRoot();
-		EclipseSerializer.deserializeResource(stream, workspaceRoot,
-				IFile.class);
+		appSpecificationFile= EclipseSerializer.deserializeResource(stream,
+		        workspaceRoot, IFile.class);
 
 		appSpecificationParser= new AppSpecificationParser();
 	}
