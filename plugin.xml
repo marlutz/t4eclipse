@@ -22,11 +22,13 @@
             categoryId="ch.mlutz.plugins.t4e.commands.category.tapestry"
             id="ch.mlutz.plugins.t4e.commands.refreshAll">
       </command>
+      <!--
       <command
             name="Analyze Java Source File"
             categoryId="ch.mlutz.plugins.t4e.commands.category.tapestry"
             id="ch.mlutz.plugins.t4e.commands.analyzeJavaSourceFile">
       </command>
+      -->
       <command
             name="Add Maven Recursive Dependencies"
             categoryId="ch.mlutz.plugins.t4e.commands.category.tapestry"
@@ -74,10 +76,12 @@
             commandId="ch.mlutz.plugins.t4e.commands.refreshAll"
             class="ch.mlutz.plugins.t4e.handlers.RefreshHandler">
       </handler>
+      <!--
       <handler
             commandId="ch.mlutz.plugins.t4e.commands.analyzeJavaSourceFile"
             class="ch.mlutz.plugins.t4e.handlers.AnalyzeHandler">
       </handler>
+      -->
       <handler
             commandId="ch.mlutz.plugins.t4e.commands.addT4eClasspathContainer"
             class="ch.mlutz.plugins.t4e.handlers.ClasspathContainerHandler">
@@ -115,12 +119,14 @@
             sequence="Ctrl+Tab"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
       </key>
+      <!--
       <key
             commandId="ch.mlutz.plugins.t4e.commands.openTapestryComponent"
             contextId="org.eclipse.ui.contexts.window"
             sequence="Shift+F3"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
       </key>
+      -->
    </extension>
    
    <!-- context menu extension to package explorer -->
@@ -214,7 +220,6 @@
                   id="ch.mlutz.plugins.t4e.menus.packageexplorer.removeT4eClasspathContainer"
                   mnemonic="R"
            	      style="toggle">
- 
                     <visibleWhen>
 				           <with variable="activeMenuSelection">
 				            <iterate
@@ -225,11 +230,11 @@
 				           </with>
          			</visibleWhen>
             </command>
+            <!--
             <command
                   commandId="ch.mlutz.plugins.t4e.commands.analyzeJavaSourceFile"
                   id="ch.mlutz.plugins.t4e.menus.packageexplorer.analyzeJavaSourceFile"
                   mnemonic="A">
- 
                     <visibleWhen>
 				           <with variable="activeMenuSelection">
 				            <iterate
@@ -241,6 +246,7 @@
 				           </with>
          			</visibleWhen>
             </command>
+            -->
             </menu>
       </menuContribution>
    </extension>
