@@ -10,10 +10,11 @@
  ******************************************************************************/
 package ch.mlutz.plugins.t4e.index;
 
+import static ch.mlutz.plugins.t4e.tools.EclipseTools.extractFileExtension;
 import static ch.mlutz.plugins.t4e.tools.EclipseTools.openFileInEditor;
 import static ch.mlutz.plugins.t4e.tools.TapestryTools.isAppSpecification;
 import static ch.mlutz.plugins.t4e.tools.TapestryTools.isComponentSpecification;
-import static ch.mlutz.plugins.t4e.tools.TapestryTools.isHtmlFile;
+import static ch.mlutz.plugins.t4e.tools.TapestryTools.isHtmlFileChecked;
 import static ch.mlutz.plugins.t4e.tools.TapestryTools.isJavaFile;
 import static ch.mlutz.plugins.t4e.tools.TapestryTools.isPageSpecification;
 
@@ -340,7 +341,7 @@ public class TapestryIndexer implements ITapestryModuleChangeListener {
 	public void switchToFile(IFile target, IWorkbenchPage activePage) {
 		try
 		{
-			if (isHtmlFile(target)) {
+			if (isHtmlFileChecked(target)) {
 				openFileInEditor(target, activePage, Constants.TAPESTRY_EDITOR_ID);
 			} else {
 				openFileInEditor(target, activePage);
@@ -360,14 +361,14 @@ public class TapestryIndexer implements ITapestryModuleChangeListener {
 	 */
 	public synchronized IFile getRelatedFile(IFile file) {
 		IFile target= null;
-		Set<Object> toSet= tapestryIndex.getRelatedObjects(file);
+		Set<Object> toSet= getTapestryIndex().getRelatedObjects(file);
 		if (toSet.size() > 0) {
 			for (Object toFile: toSet) {
 
 				// prefer html/java files
 				boolean isPreferred= false;
 				try {
-					isPreferred= (toFile instanceof IFile && isHtmlFile((IFile) toFile))
+					isPreferred= (toFile instanceof IFile && isHtmlFileChecked((IFile) toFile))
 							|| toFile instanceof ICompilationUnit;
 				} catch(CoreException e) {
 					log.warn("Couldn't check toFile if it is Html or Java.", e);
@@ -450,5 +451,22 @@ public class TapestryIndexer implements ITapestryModuleChangeListener {
 		        + " unit " + compilationUnit.getElementName(), e);
 		}
 		return null;
+	}
+
+	public static boolean isHtmlFile(IFile file) {
+        try {
+            return isHtmlFileChecked(file);
+        } catch (CoreException e) {
+            log.warn("isHtmlFileChecked(" + file.getName() + ") threw "
+                + "exception: ", e);
+        }
+        return false;
+	}
+
+	public TapestryIndex getTapestryIndex() {
+       if (tapestryIndexStore == null) {
+           tapestryIndexStore= Activator.getDefault().getTapestryIndex();
+       }
+       return tapestryIndexStore;
 	}
 }

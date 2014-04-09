@@ -11,7 +11,7 @@
 package ch.mlutz.plugins.t4e.handlers;
 
 import static ch.mlutz.plugins.t4e.tools.EclipseTools.openFileInEditor;
-import static ch.mlutz.plugins.t4e.tools.TapestryTools.isHtmlFile;
+import static ch.mlutz.plugins.t4e.tools.TapestryTools.isHtmlFileChecked;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -143,7 +143,7 @@ public class CommandHandler extends AbstractHandler implements
 			// check if file is already in index ==> also catches Java files
 			IFile toFile= tapestryIndexer.getRelatedFile(currentFile);
 			if (toFile != null) {
-				if (isHtmlFile(toFile)) {
+				if (isHtmlFileChecked(toFile)) {
 					openFileInEditor(toFile, activePage, "ch.mlutz.plugins.t4e.editors.tapestryEditor");
 				} else {
 					openFileInEditor(toFile, activePage);

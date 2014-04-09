@@ -439,9 +439,8 @@ public class TapestryModule implements Serializable {
 		return null;
 	}
 
-	private ICompilationUnit findRelatedUnit(IFile currentFile) throws
-			CoreException {
-		if (TapestryTools.isHtmlFile(currentFile)) {
+	private ICompilationUnit findRelatedUnit(IFile currentFile) throws CoreException {
+		if (TapestryTools.isHtmlFileChecked(currentFile)) {
 			return findRelatedUnitForHtml(currentFile);
 		} else if (TapestryTools.isPageSpecification(currentFile)) {
 			return findRelatedUnitForSpecification(currentFile,

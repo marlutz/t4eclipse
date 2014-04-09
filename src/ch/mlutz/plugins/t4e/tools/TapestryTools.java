@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.content.IContentDescription;
 
 public class TapestryTools {
 	public static final String FILE_EXTENSION_HTML= ".html";
@@ -26,7 +27,7 @@ public class TapestryTools {
 	public static final String FILE_EXTENSION_PAGE= ".page";
 	public static final String FILE_EXTENSION_APPLICATION= ".application";
 
-	public static boolean isHtmlFile(IFile file) throws CoreException {
+	public static boolean isHtmlFileChecked(IFile file) throws CoreException {
 		return FILE_EXTENSION_HTML.equalsIgnoreCase(extractFileExtension(file.getName())) ||
 				(file.getContentDescription() != null
 				&& file.getContentDescription().getContentType().equals(

@@ -85,9 +85,19 @@ public class ResourceChangeListener implements IResourceChangeListener {
 
 				files = getFiles(event.getDelta(), IResourceDelta.ADDED);
 				for (IFile file: files) {
-					try {
-						if (TapestryTools.isHtmlFile(file)) {
-							tapestryIndex.handleHtmlFile(file);
+					if (TapestryIndexer.isHtmlFile(file)) {
+						htmlFileAdded(file, tapestryIndex);
+					} else if (TapestryTools.isComponentSpecification(file)) {
+						IFile htmlFile= TapestryTools
+							.findHtmlForSpecificationFile(file);
+						if (htmlFile != null) {
+							htmlFileChanged(htmlFile, tapestryIndex);
+						}
+					} else if (TapestryTools.isPageSpecification(file)) {
+						IFile htmlFile= TapestryTools
+							.findHtmlForSpecificationFile(file);
+						if (htmlFile != null) {
+							htmlFileChanged(htmlFile, tapestryIndex);
 						}
 					} catch (CoreException e) {
 						log.error("Error on resourceChanged", e);
@@ -100,7 +110,23 @@ public class ResourceChangeListener implements IResourceChangeListener {
 				log.info("Removed: " + files.size() + " ");
 				// do something with new projects
 				for (IFile file: files) {
-					log.info(file.getName() + ", ");
+					if (TapestryIndexer.isHtmlFile(file)) {
+						htmlFileRemoved(file, tapestryIndex);
+					} else if (TapestryTools.isComponentSpecification(file)) {
+						IFile htmlFile= TapestryTools
+							.findHtmlForSpecificationFile(file);
+						if (htmlFile != null) {
+							htmlFileChanged(htmlFile, tapestryIndex);
+						}
+					} else if (TapestryTools.isPageSpecification(file)) {
+						IFile htmlFile= TapestryTools
+							.findHtmlForSpecificationFile(file);
+						if (htmlFile != null) {
+							htmlFileChanged(htmlFile, tapestryIndex);
+						}
+					} else if (TapestryTools.isAppSpecification(file)) {
+						appSpecificationRemoved(file, tapestryIndex);
+					}
 				}
 			}
 
