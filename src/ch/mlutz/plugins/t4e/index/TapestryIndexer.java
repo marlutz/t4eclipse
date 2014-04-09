@@ -40,6 +40,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 
+import ch.mlutz.plugins.t4e.Activator;
 import ch.mlutz.plugins.t4e.constants.Constants;
 import ch.mlutz.plugins.t4e.log.EclipseLogFactory;
 import ch.mlutz.plugins.t4e.log.IEclipseLog;
@@ -67,13 +68,11 @@ public class TapestryIndexer implements ITapestryModuleChangeListener {
 			TapestryIndexer.class);
 
 	/**
-	 * the Tapestry index storing the file relations
-	 */
-	private TapestryIndex tapestryIndex;
+     * the Tapestry index storing the file relations
+     */
+    private transient TapestryIndex tapestryIndexStore;
 
-	public TapestryIndexer(TapestryIndex tapestryIndex) {
-		this.tapestryIndex= tapestryIndex;
-	}
+	public TapestryIndexer() {}
 
 
 	private void checkForProgressMonitorCancel() {
@@ -259,7 +258,7 @@ public class TapestryIndexer implements ITapestryModuleChangeListener {
 
 	public void addProjectToIndex(IProject project, IFile switchToRelatedFile,
 			IWorkbenchPage activePage) {
-		if (tapestryIndex.contains(project)) {
+		if (getTapestryIndex().contains(project)) {
 			return;
 		}
 
@@ -280,12 +279,12 @@ public class TapestryIndexer implements ITapestryModuleChangeListener {
 
 					monitor.beginTask(this.getName(), totalWork);
 
-					tapestryIndex.add(projectToAdd);
+					getTapestryIndex().add(projectToAdd);
 
 					monitor.worked(100);
 
 					for (TapestryModule module: modulesToAdd) {
-						tapestryIndex.add(module);
+						getTapestryIndex().add(module);
 						module.scanAndUpdateIndex(monitor);
 					}
 
@@ -320,13 +319,13 @@ public class TapestryIndexer implements ITapestryModuleChangeListener {
 	}
 
 	public void removeProjectFromIndex(IProject project) {
-		if (!tapestryIndex.contains(project)) {
+		if (!getTapestryIndex().contains(project)) {
 			return;
 		}
 
-		Set<TapestryModule> modules= tapestryIndex.getModules();
+		Set<TapestryModule> modules= getTapestryIndex().getModules();
 		List<TapestryModule> toRemove=
-				tapestryIndex.getModulesForProject(project);
+				getTapestryIndex().getModulesForProject(project);
 
 		for (TapestryModule module: toRemove) {
 			tapestryIndex.remove(module);
@@ -407,11 +406,11 @@ public class TapestryIndexer implements ITapestryModuleChangeListener {
 			case PAGE:
 				htmlElement= (TapestryHtmlElement) element;
 				for (Pair<IFile, Object> relation: htmlElement.getRelations()) {
-					tapestryIndex.addBidiRelation(relation.getLeft(),
+					getTapestryIndex().addBidiRelation(relation.getLeft(),
 						relation.getRight());
 				}
 				/*
-				tapestryIndex.addRelationToCompilationUnit(
+				getTapestryIndex().addRelationToCompilationUnit(
 					htmlElement.getHtmlFile(), htmlElement.getJavaCompilationUnit());
 					*/
 				break;

@@ -96,6 +96,9 @@ public class Activator extends AbstractUIPlugin {
 				ObjectInput ois= new ObjectInputStream(bis);
 				try {
 					tapestryIndex= (TapestryIndex) ois.readObject();
+				} catch (Exception e) {
+				    log.warn("Couldn't deserialize tapestryIndex, might be"
+				        + " corrupt: ", e);
 				}
 				finally {
 					ois.close();
@@ -194,6 +197,10 @@ public class Activator extends AbstractUIPlugin {
 		return image;
 	}
 
+	public void setTapestryIndex(TapestryIndex tapestryIndex) {
+        this.tapestryIndex= tapestryIndex;
+    }
+
 	/**
 	 * @return the tapestryIndex
 	 */
@@ -206,7 +213,7 @@ public class Activator extends AbstractUIPlugin {
 
 	public TapestryIndexer getTapestryIndexer() {
 		if (tapestryIndexer == null) {
-			tapestryIndexer= new TapestryIndexer(getTapestryIndex());
+			tapestryIndexer= new TapestryIndexer();
 		}
 		return tapestryIndexer;
 	}

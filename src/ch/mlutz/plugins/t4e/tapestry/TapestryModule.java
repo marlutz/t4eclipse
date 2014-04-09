@@ -725,10 +725,6 @@ public class TapestryModule implements Serializable {
 		return null;
 	}
 
-	public void setTapestryIndex(TapestryIndex tapestryIndex) {
-		tapestryIndexStore= tapestryIndex;
-	}
-
 	public TapestryIndex getTapestryIndex() {
 		if (tapestryIndexStore == null) {
 			tapestryIndexStore= Activator.getDefault().getTapestryIndex();

@@ -50,6 +50,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.IDocument;
 
+import ch.mlutz.plugins.t4e.Activator;
 import ch.mlutz.plugins.t4e.log.EclipseLogFactory;
 import ch.mlutz.plugins.t4e.log.IEclipseLog;
 import ch.mlutz.plugins.t4e.serializer.EclipseSerializer;
@@ -346,6 +347,11 @@ public class TapestryIndex implements Serializable {
 
 	private void readObject(java.io.ObjectInputStream stream)
 			throws IOException, ClassNotFoundException {
+
+	    // IMPORTANT: set reference in Activator first; otherwise, we might get
+	    // multiple instances of TapestryIndex
+	    Activator.getDefault().setTapestryIndex(this);
+
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		appSpecificationMap= EclipseSerializer.deserializeMapResourceSet(stream,
 				workspaceRoot,
