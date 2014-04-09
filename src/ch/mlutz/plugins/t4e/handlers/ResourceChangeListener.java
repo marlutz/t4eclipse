@@ -68,22 +68,12 @@ public class ResourceChangeListener implements IResourceChangeListener {
 					} else if (TapestryTools.isPageSpecification(file)) {
 						handlePageSpecification(tapestryIndex, file);
 					} else if (TapestryTools.isAppSpecification(file)) {
-						TapestryModule module= tapestryIndex
-							.getModuleForResource(file);
-						module.clear();
-						tapestryIndex.remove(module);
-
-						try {
-							module= new TapestryModule(file, Activator.getDefault()
-								.getTapestryIndexer());
-						} catch(TapestryException e) {
-							log.warn("Could not create TapestryModule from "
-								+ "file " + file.getName(), e);
-						}
+						appSpecificationRemoved(file, tapestryIndex);
+						appSpecificationAdded(file, tapestryIndex);
 					}
 				}
 
-				files = getFiles(event.getDelta(), IResourceDelta.ADDED);
+				files= getFiles(event.getDelta(), IResourceDelta.ADDED);
 				for (IFile file: files) {
 					if (TapestryIndexer.isHtmlFile(file)) {
 						htmlFileAdded(file, tapestryIndex);
@@ -99,16 +89,12 @@ public class ResourceChangeListener implements IResourceChangeListener {
 						if (htmlFile != null) {
 							htmlFileChanged(htmlFile, tapestryIndex);
 						}
-					} catch (CoreException e) {
-						log.error("Error on resourceChanged", e);
+					} else if (TapestryTools.isAppSpecification(file)) {
+						appSpecificationAdded(file, tapestryIndex);
 					}
 				}
-			}
 
-			files = getFiles(event.getDelta(), IResourceDelta.REMOVED);
-			if (files.size() > 0 && logFileChanges) {
-				log.info("Removed: " + files.size() + " ");
-				// do something with new projects
+				files= getFiles(event.getDelta(), IResourceDelta.REMOVED);
 				for (IFile file: files) {
 					if (TapestryIndexer.isHtmlFile(file)) {
 						htmlFileRemoved(file, tapestryIndex);
@@ -177,7 +163,7 @@ public class ResourceChangeListener implements IResourceChangeListener {
 					log.info(project.getName() + ", ");
 				}
 			}
-
+		/*
 		} else if (event.getType() == IResourceChangeEvent.PRE_REFRESH) {
 			log.info("ResourceChanged: PRE_REFRESH");
 
@@ -201,7 +187,7 @@ public class ResourceChangeListener implements IResourceChangeListener {
 					}
 				}
 			}
-
+		*/
 		} else if (event.getType() == IResourceChangeEvent.PRE_CLOSE) {
 			if (logOtherChanges) {
 				System.out.println("Pre-Close event!" + " " + event.getResource().getName());
@@ -233,14 +219,68 @@ public class ResourceChangeListener implements IResourceChangeListener {
 		// System.out.println("Something changed!" + arg0.getType() + " " + arg0.toString() + " " + arg0.getResource());
 	}
 
+	/**
+	 * @param file
+	 * @param tapestryIndex
+	 */
+	public void appSpecificationAdded(IFile file, TapestryIndex tapestryIndex)
+	{
+		TapestryModule module;
+		try {
+			module= new TapestryModule(file, Activator.getDefault()
+				.getTapestryIndexer());
+			tapestryIndex.add(module);
+		} catch(TapestryException e) {
+			log.warn("Could not create TapestryModule from "
+				+ "file " + file.getName(), e);
+		}
+	}
+
+	/**
+	 * @param tapestryIndex
+	 * @param file
+	 */
+	public void appSpecificationRemoved(IFile file, TapestryIndex tapestryIndex)
+	{
+		TapestryModule module= tapestryIndex
+			.getModuleForResource(file);
+
+		// remove all elements of the module from tapestry
+		// index
+		getTapestryIndexer().removeModuleFromIndex(module);
+	}
+
 	private void handleComponentSpecification(TapestryIndex tapestryIndex,
 			IFile file) {
 		TapestryModule module= tapestryIndex.getModuleForResource(file);
 		TapestryHtmlElement element= module.findComponentForSpecification(file);
+		IFile htmlFile= null;
 		if (element != null) {
+			htmlFile= element.getHtmlFile();
 			module.remove(element);
-
 		}
+		if (htmlFile != null) {
+			try
+			{
+				module.findRelatedFile(htmlFile);
+			}
+			catch(CoreException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void htmlFileChanged(IFile htmlFile, TapestryIndex tapestryIndex) {
+		TapestryModule module= tapestryIndex.getModuleForResource(htmlFile);
+		htmlFileChanged(htmlFile, module, tapestryIndex);
+	}
+
+	private void htmlFileChanged(IFile htmlFile, TapestryModule module,
+		TapestryIndex tapestryIndex) {
+		htmlFileRemoved(htmlFile, module, tapestryIndex);
+		htmlFileAdded(htmlFile, module, tapestryIndex);
 	}
 
 	private void htmlFileAdded(IFile htmlFile, TapestryIndex tapestryIndex) {
@@ -268,13 +308,8 @@ public class ResourceChangeListener implements IResourceChangeListener {
 			TapestryIndex tapestryIndex) {
 		TapestryHtmlElement htmlElement= module.findHtmlElementForHtmlFile(
 				htmlFile);
-
-		if (htmlFile != null) {
-			try {
-				module.findRelatedFile(htmlFile);
-			} catch (CoreException e) {
-				log.warn("CoreException in ResourceChangeListener: ", e);
-			}
+		if (htmlElement != null) {
+			module.remove(htmlElement);
 		}
 	}
 
