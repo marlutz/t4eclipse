@@ -17,4 +17,5 @@ public interface Command {
 	String ANALYZE = "ch.mlutz.plugins.t4e.commands.analyzeJavaSourceFile";
 	String ADD_CLASSPATH_CONTAINER = "ch.mlutz.plugins.t4e.commands.addT4eClasspathContainer";
 	String REMOVE_CLASSPATH_CONTAINER = "ch.mlutz.plugins.t4e.commands.removeT4eClasspathContainer";
+	String CLEAR_TAPESTRY_INDEX = "ch.mlutz.plugins.t4e.commands.clearTapestryIndex";
 }
