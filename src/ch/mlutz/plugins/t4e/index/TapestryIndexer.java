@@ -33,7 +33,9 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
@@ -328,10 +330,18 @@ public class TapestryIndexer implements ITapestryModuleChangeListener {
 				getTapestryIndex().getModulesForProject(project);
 
 		for (TapestryModule module: toRemove) {
-			tapestryIndex.remove(module);
+			removeModuleFromIndex(module);
 		}
 	}
 
+    /**
+     * @param module
+     */
+    public void removeModuleFromIndex(TapestryModule module)
+    {
+        module.clear();
+        getTapestryIndex().remove(module);
+    }
 
 	/**
 	 * @param target
@@ -428,11 +438,10 @@ public class TapestryIndexer implements ITapestryModuleChangeListener {
 	        case PAGE:
 	            htmlElement= (TapestryHtmlElement) element;
 	            for (Pair<IFile, Object> relation: htmlElement.getRelations()) {
-	                tapestryIndex.addBidiRelation(relation.getLeft(),
-	                    relation.getRight());
+	                getTapestryIndex().removeAllRelations(relation.getLeft());
 	            }
 	            /*
-	            tapestryIndex.addRelationToCompilationUnit(
+	            getTapestryIndex().addRelationToCompilationUnit(
 	                htmlElement.getHtmlFile(), htmlElement.getJavaCompilationUnit());
 	            */
 	            break;

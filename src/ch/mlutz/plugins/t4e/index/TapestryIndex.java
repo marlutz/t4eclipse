@@ -380,21 +380,21 @@ public class TapestryIndex implements Serializable {
 		projects= EclipseSerializer.deserializeResourceSet(stream,
 				workspaceRoot, IProject.class);
 
+		// initialize transient variables
+        appSpecificationParser= new AppSpecificationParser();
+
+        relationMap= new HashMap<IFile, Object>();
+
+        webappFolderMap= new HashMap<IContainer, TapestryModule>();
+
+        documentToFileMap= new HashMap<IDocument, IFile>();
+
+        relationToCompilationUnit=
+            new HashMap<IFile, ICompilationUnit>();
+
 		@SuppressWarnings("unchecked")
 		Set<TapestryModule> readObject = (Set<TapestryModule>) stream.readObject();
 		modules= readObject;
-
-		// initialize transient variables
-		appSpecificationParser= new AppSpecificationParser();
-
-		relationMap= new HashMap<IFile, Object>();
-
-		webappFolderMap= new HashMap<IContainer, TapestryModule>();
-
-		documentToFileMap= new HashMap<IDocument, IFile>();
-
-		relationToCompilationUnit=
-			new HashMap<IFile, ICompilationUnit>();
 
 		// postprocessing
 		for (TapestryModule module: modules) {
@@ -553,7 +553,7 @@ public class TapestryIndex implements Serializable {
 		}
 	}
 
-	/**
+	/*
 	 * ... If multiple targets for file exist, returns just the first one
 	 *
 	 * @param file
@@ -578,6 +578,13 @@ public class TapestryIndex implements Serializable {
 		}
 	}
 	*/
+
+	public synchronized void removeAllRelations(Object o) {
+	    // NOTE: always first use remove To, because it needs
+	    // existing From relations to do it's job
+	    removeRelationsTo(o);
+	    removeRelationsFrom(o);
+	}
 
 	public synchronized void removeRelationsFrom(Object from) {
 		if (from instanceof IFile) {
