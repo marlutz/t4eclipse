@@ -35,8 +35,8 @@ import ch.mlutz.plugins.t4e.index.TapestryIndex;
 import ch.mlutz.plugins.t4e.log.EclipseLogFactory;
 import ch.mlutz.plugins.t4e.log.IEclipseLog;
 import ch.mlutz.plugins.t4e.tapestry.TapestryModule;
+import ch.mlutz.plugins.t4e.tapestry.editor.hyperlink.SourceRangeHyperlink;
 import ch.mlutz.plugins.t4e.tapestry.element.TapestryHtmlElement;
-import ch.mlutz.plugins.t4e.tools.EclipseTools;
 
 public class TapestryHyperlinkDetector extends AbstractHyperlinkDetector {
 
@@ -114,7 +114,9 @@ public class TapestryHyperlinkDetector extends AbstractHyperlinkDetector {
 		}
 
 		final String hyperlinkText= contentBefore.substring(componentIdStart,
-			componentIdStart + hyperLinkLength);
+			componentIdStart + hyperlinkLength);
+
+		IRegion hyperlinkRegion= new Region(hyperlinkOffset, hyperlinkLength);
 
 		TapestryIndex tapestryIndex= Activator.getDefault().getTapestryIndex();
 		IFile documentFile= tapestryIndex.getDocumentToFileMapping(document);
@@ -143,40 +145,25 @@ public class TapestryHyperlinkDetector extends AbstractHyperlinkDetector {
 		}
 		*/
 
-		final IRegion finalHyperlinkRegion= region;
-
 		IWorkbench wb = PlatformUI.getWorkbench();
 		   IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
 		final   IWorkbenchPage page = win.getActivePage();
 
+		SourceRangeHyperlink hyperlink;
+
 		if (finalLinkedComponent != null) {
+
+			// Html hyperlink
 			if (finalLinkedComponent.getHtmlFile() != null) {
-				result.add(new IHyperlink() {
-
-					@Override
-					public void open() {
-						EclipseTools.openFileInEditor(
-							finalLinkedComponent.getHtmlFile(), page,
-							Constants.TAPESTRY_EDITOR_ID);
-					}
-
-					@Override
-					public String getTypeLabel() {
-						return null;
-					}
-
-					@Override
-					public String getHyperlinkText() {
-						return "Open HTML template";
-					}
-
-					@Override
-					public IRegion getHyperlinkRegion() {
-						return new Region(hyperLinkOffset, hyperLinkLength);
-					}
-				});
+				hyperlink= new SourceRangeHyperlink(
+						hyperlinkRegion,
+						"Open HTML template",
+						finalLinkedComponent.getHtmlFile(), null,
+						Constants.TAPESTRY_EDITOR_ID);
+				result.add(hyperlink);
 			}
 
+			// Java hyperlink
 			IFile javaFile= null;
 			try {
 				if (finalLinkedComponent.getJavaCompilationUnit() != null) {
@@ -191,56 +178,24 @@ public class TapestryHyperlinkDetector extends AbstractHyperlinkDetector {
 			}
 
 			if (javaFile != null) {
-				final IFile finalJavaFile= javaFile;
-				result.add(new IHyperlink() {
-
-					@Override
-					public void open() {
-						EclipseTools.openFileInEditor(
-							finalJavaFile, page);
-					}
-
-					@Override
-					public String getTypeLabel() {
-						return null;
-					}
-
-					@Override
-					public String getHyperlinkText() {
-						return "Open Java class";
-					}
-
-					@Override
-					public IRegion getHyperlinkRegion() {
-						return new Region(hyperLinkOffset, hyperLinkLength);
-					}
-				});
+				hyperlink= new SourceRangeHyperlink(
+						hyperlinkRegion,
+						"Open Java class",
+						javaFile, null, null);
+				result.add(hyperlink);
 			}
 
+			// Specification hyperlink
 			if (finalLinkedComponent.getSpecification() != null) {
-				result.add(new IHyperlink() {
-
-					@Override
-					public void open() {
-						EclipseTools.openFileInEditor(
-							finalLinkedComponent.getSpecification(), page);
-					}
-
-					@Override
-					public String getTypeLabel() {
-						return null;
-					}
-
-					@Override
-					public String getHyperlinkText() {
-						return "Open specification";
-					}
-
-					@Override
-					public IRegion getHyperlinkRegion() {
-						return new Region(hyperLinkOffset, hyperLinkLength);
-					}
-				});
+				// Html hyperlink
+				if (finalLinkedComponent.getHtmlFile() != null) {
+					hyperlink= new SourceRangeHyperlink(
+							hyperlinkRegion,
+							"Open specification",
+							finalLinkedComponent.getSpecification(), null,
+							null);
+					result.add(hyperlink);
+				}
 			}
 		}
 
