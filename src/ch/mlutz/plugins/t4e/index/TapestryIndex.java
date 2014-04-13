@@ -299,7 +299,7 @@ public class TapestryIndex implements Serializable {
 		// NEW INFRASTRUCTURE
 		projects.clear();
 		relationMap.clear();
-		relationToCompilationUnit.clear();
+		// relationToCompilationUnit.clear();
 		webappFolderMap.clear();
 		modules.clear();
 		documentToFileMap.clear();
@@ -389,8 +389,10 @@ public class TapestryIndex implements Serializable {
 
         documentToFileMap= new HashMap<IDocument, IFile>();
 
+        /*
         relationToCompilationUnit=
             new HashMap<IFile, ICompilationUnit>();
+        */
 
 		@SuppressWarnings("unchecked")
 		Set<TapestryModule> readObject = (Set<TapestryModule>) stream.readObject();
@@ -411,8 +413,10 @@ public class TapestryIndex implements Serializable {
 
 	private transient Map<IFile, Object> relationMap= new HashMap<IFile, Object>();
 
+	/*
 	private transient Map<IFile, ICompilationUnit> relationToCompilationUnit=
 		new HashMap<IFile, ICompilationUnit>();
+	*/
 
 	private transient Map<IContainer, TapestryModule> webappFolderMap=
 			new HashMap<IContainer, TapestryModule>();
