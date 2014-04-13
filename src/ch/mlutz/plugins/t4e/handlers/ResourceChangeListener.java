@@ -369,7 +369,7 @@ public class ResourceChangeListener implements IResourceChangeListener {
 				}
 			});
 		} catch (CoreException e) {
-			// handle error
+			log.error("Couldn't get files from delta: ", e);
 		}
 		return files;
 	}
