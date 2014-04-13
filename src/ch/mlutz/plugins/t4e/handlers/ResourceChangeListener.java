@@ -195,6 +195,7 @@ public class ResourceChangeListener implements IResourceChangeListener {
 		} else {
 			log.info("ResourceChanged: " + event.getType());
 
+			/* DEBUG: code below might throw NPE
 			List<IProject> projects = getProjects(event.getDelta(), IResourceDelta.OPEN);
 			if (projects.size() > 0 && logOtherChanges) {
 				log.info("Opened P: " + projects.size() + " ");
@@ -215,6 +216,7 @@ public class ResourceChangeListener implements IResourceChangeListener {
 					}
 				}
 			}
+			*/
 		}
 		// System.out.println("Something changed!" + arg0.getType() + " " + arg0.toString() + " " + arg0.getResource());
 	}
@@ -274,7 +276,9 @@ public class ResourceChangeListener implements IResourceChangeListener {
 
 	private void htmlFileChanged(IFile htmlFile, TapestryIndex tapestryIndex) {
 		TapestryModule module= tapestryIndex.getModuleForResource(htmlFile);
-		htmlFileChanged(htmlFile, module, tapestryIndex);
+		if (module != null) {
+			htmlFileChanged(htmlFile, module, tapestryIndex);
+		}
 	}
 
 	private void htmlFileChanged(IFile htmlFile, TapestryModule module,
@@ -285,7 +289,9 @@ public class ResourceChangeListener implements IResourceChangeListener {
 
 	private void htmlFileAdded(IFile htmlFile, TapestryIndex tapestryIndex) {
 		TapestryModule module= tapestryIndex.getModuleForResource(htmlFile);
-		htmlFileAdded(htmlFile, module, tapestryIndex);
+		if (module != null) {
+			htmlFileAdded(htmlFile, module, tapestryIndex);
+		}
 	}
 
 	private void htmlFileAdded(IFile htmlFile, TapestryModule module,
@@ -301,7 +307,9 @@ public class ResourceChangeListener implements IResourceChangeListener {
 
 	private void htmlFileRemoved(IFile htmlFile, TapestryIndex tapestryIndex) {
 		TapestryModule module= tapestryIndex.getModuleForResource(htmlFile);
-		htmlFileRemoved(htmlFile, module, tapestryIndex);
+		if (module != null) {
+			htmlFileRemoved(htmlFile, module, tapestryIndex);
+		}
 	}
 
 	private void htmlFileRemoved(IFile htmlFile, TapestryModule module,
