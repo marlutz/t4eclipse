@@ -29,7 +29,7 @@ public class TapestryTools {
 
 	public static boolean isHtmlFileChecked(IFile file) throws CoreException {
 		return FILE_EXTENSION_HTML.equalsIgnoreCase(extractFileExtension(file.getName())) ||
-				(file.getContentDescription() != null
+				(file.exists() && file.getContentDescription() != null
 				&& file.getContentDescription().getContentType().equals(
 						Platform.getContentTypeManager().getContentType("org.eclipse.wst.html.core.htmlsource")
 				));
