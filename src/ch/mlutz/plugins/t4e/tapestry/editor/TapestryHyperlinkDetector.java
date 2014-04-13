@@ -99,21 +99,21 @@ public class TapestryHyperlinkDetector extends AbstractHyperlinkDetector {
 			charIndex++;
 		}
 
-		final int hyperLinkOffset= partition.getOffset() + componentIdStart;
+		int hyperlinkOffset= partition.getOffset() + componentIdStart;
 
-		final int hyperLinkLength= partition.getOffset() + charIndex
-				- hyperLinkOffset;
+		int hyperlinkLength= partition.getOffset() + charIndex
+				- hyperlinkOffset;
 
-		if (hyperLinkLength < 0) {
+		if (hyperlinkLength < 0) {
 			// caret might rest on the first quote
-			log.warn("hyperLinkLength: " + hyperLinkLength
+			log.warn("hyperlinkLength: " + hyperlinkLength
 				+ "; partition.getOffset(): " + partition.getOffset()
 				+ "; charIndex: " + charIndex
-				+ "; hyperLinkOffset: " + hyperLinkOffset);
+				+ "; hyperlinkOffset: " + hyperlinkOffset);
 			return ognlHyperlinkDetector.detectHyperlinks(viewer, region, canHandleMultipleLinks);
 		}
 
-		final String hyperlinkText= contentBefore.substring(componentIdStart,
+		String hyperlinkText= contentBefore.substring(componentIdStart,
 			componentIdStart + hyperlinkLength);
 
 		IRegion hyperlinkRegion= new Region(hyperlinkOffset, hyperlinkLength);
