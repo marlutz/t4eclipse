@@ -137,7 +137,7 @@ public class CommandHandler extends AbstractHandler implements
 
 		// check and add project to TapestryIndex if necessary
 		if (!tapestryIndex.contains(project)) {
-			tapestryIndexer.addProjectToIndex(project, currentFile, activePage);
+			tapestryIndexer.addProjectToIndex(project, currentFile, activePage, true);
 			log.info("Added project " + project.toString() + ".");
 		} else {
 			// check if file is already in index ==> also catches Java files

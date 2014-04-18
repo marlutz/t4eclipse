@@ -255,11 +255,15 @@ public class TapestryIndexer implements ITapestryModuleChangeListener {
 	 *
 	 */
 	public void addProjectToIndex(IProject project) {
-		addProjectToIndex(project, null, null);
+		addProjectToIndex(project, null, null, true);
+	}
+
+	public void addProjectToIndex(IProject project, boolean asynchronous) {
+		addProjectToIndex(project, null, null, asynchronous);
 	}
 
 	public void addProjectToIndex(IProject project, IFile switchToRelatedFile,
-			IWorkbenchPage activePage) {
+			IWorkbenchPage activePage, boolean asynchronous) {
 		if (getTapestryIndex().contains(project)) {
 			return;
 		}
@@ -274,16 +278,20 @@ public class TapestryIndexer implements ITapestryModuleChangeListener {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				try {
-					int totalWork= 100;
-					for (TapestryModule module: modulesToAdd) {
-						totalWork+= module.getScanAndUpdateWork();
-					}
+					if (monitor != null) {
+						int totalWork= 100;
+						for (TapestryModule module: modulesToAdd) {
+							totalWork+= module.getScanAndUpdateWork();
+						}
 
-					monitor.beginTask(this.getName(), totalWork);
+						monitor.beginTask(this.getName(), totalWork);
+					}
 
 					getTapestryIndex().add(projectToAdd);
 
-					monitor.worked(100);
+					if (monitor != null) {
+						monitor.worked(100);
+					}
 
 					for (TapestryModule module: modulesToAdd) {
 						getTapestryIndex().add(module);
@@ -310,14 +318,30 @@ public class TapestryIndexer implements ITapestryModuleChangeListener {
 				} catch(TapestryException e) {
 					log.error("Could not add project " + projectToAdd.getName(), e);
 				} finally {
-					monitor.done();
+					if (monitor != null) {
+						monitor.done();
+					}
 				}
 				return Status.OK_STATUS;
 			}
 		};
-		job.setUser(true);
-		job.setPriority(Job.SHORT);
-		job.schedule(); // start as soon as possible
+		if (asynchronous) {
+			job.setUser(true);
+			job.setPriority(Job.SHORT);
+			job.schedule(); // start as soon as possible
+		} else {
+			getTapestryIndex().add(projectToAdd);
+
+			for (TapestryModule module: modulesToAdd) {
+				getTapestryIndex().add(module);
+				try {
+					module.scanAndUpdateIndex(null);
+				} catch (TapestryException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	public void removeProjectFromIndex(IProject project) {
@@ -325,7 +349,6 @@ public class TapestryIndexer implements ITapestryModuleChangeListener {
 			return;
 		}
 
-		Set<TapestryModule> modules= getTapestryIndex().getModules();
 		List<TapestryModule> toRemove=
 				getTapestryIndex().getModulesForProject(project);
 
