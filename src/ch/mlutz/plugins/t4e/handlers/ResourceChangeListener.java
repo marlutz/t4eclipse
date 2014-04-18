@@ -54,11 +54,12 @@ public class ResourceChangeListener implements IResourceChangeListener {
 	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
 		boolean logFileChanges= true;
-		boolean logProjectChanges= false;
+		boolean logProjectChanges= true;
 		boolean logOtherChanges= false;
 
 		if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
 			List<IFile> files = getFiles(event.getDelta(), IResourceDelta.CHANGED);
+			log.info("Changed files count: " + files.size());
 
 			TapestryIndex tapestryIndex= getTapestryIndex();
 			synchronized(tapestryIndex) {
@@ -74,6 +75,7 @@ public class ResourceChangeListener implements IResourceChangeListener {
 				}
 
 				files= getFiles(event.getDelta(), IResourceDelta.ADDED);
+				log.info("Added files count: " + files.size());
 				for (IFile file: files) {
 					if (TapestryIndexer.isHtmlFile(file)) {
 						htmlFileAdded(file, tapestryIndex);
@@ -95,6 +97,7 @@ public class ResourceChangeListener implements IResourceChangeListener {
 				}
 
 				files= getFiles(event.getDelta(), IResourceDelta.REMOVED);
+				log.info("Removed files count: " + files.size());
 				for (IFile file: files) {
 					if (TapestryIndexer.isHtmlFile(file)) {
 						htmlFileRemoved(file, tapestryIndex);
@@ -114,7 +117,7 @@ public class ResourceChangeListener implements IResourceChangeListener {
 						appSpecificationRemoved(file, tapestryIndex);
 					}
 				}
-			}
+			}	// synchronized(tapestryIndex)
 
 			List<IProject> projects = getProjects(event.getDelta(), IResourceDelta.OPEN);
 			if (projects.size() > 0 && logProjectChanges) {
@@ -137,31 +140,46 @@ public class ResourceChangeListener implements IResourceChangeListener {
 				}
 			}
 
+			/*
 			projects = getProjects(event.getDelta(), IResourceDelta.CHANGED);
 			if (projects.size() > 0 && logProjectChanges) {
-				log.info("Changed P: " + projects.size() + " ");
-				// do something with new projects
+				StringBuilder sb= new StringBuilder();
+				sb.append("Changed Projects count: ");
+				sb.append(projects.size());
 				for (IProject project: projects) {
-					log.info(project.getName() + ", ");
+					sb.append(", ");
+					sb.append(project.getName());
 				}
+				log.info(sb.toString());
 			}
+			*/
 
 			projects = getProjects(event.getDelta(), IResourceDelta.ADDED);
 			if (projects.size() > 0 && logProjectChanges) {
-				log.info("Added P: " + projects.size() + " ");
-				// do something with new projects
+				StringBuilder sb= new StringBuilder();
+				sb.append("Added Projects count: ");
+				sb.append(projects.size());
 				for (IProject project: projects) {
-					log.info(project.getName() + ", ");
+					sb.append(", ");
+					sb.append(project.getName());
+				}
+				log.info(sb.toString());
+
+				for (IProject project: projects) {
+					getTapestryIndexer().addProjectToIndex(project, false);
 				}
 			}
 
 			projects = getProjects(event.getDelta(), IResourceDelta.REMOVED);
 			if (projects.size() > 0 && logProjectChanges) {
-				log.info("Removed P: " + projects.size() + " ");
-				// do something with new projects
+				StringBuilder sb= new StringBuilder();
+				sb.append("Removed Projects count: ");
+				sb.append(projects.size());
 				for (IProject project: projects) {
-					log.info(project.getName() + ", ");
+					sb.append(", ");
+					sb.append(project.getName());
 				}
+				log.info(sb.toString());
 			}
 		/*
 		} else if (event.getType() == IResourceChangeEvent.PRE_REFRESH) {
@@ -192,8 +210,18 @@ public class ResourceChangeListener implements IResourceChangeListener {
 			if (logOtherChanges) {
 				System.out.println("Pre-Close event!" + " " + event.getResource().getName());
 			}
+		} else if (event.getType() == IResourceChangeEvent.PRE_DELETE) {
+			if (event.getResource() instanceof IProject && logProjectChanges) {
+				IProject project= (IProject) event.getResource();
+				StringBuilder sb= new StringBuilder();
+				sb.append("Pre-Delete Project: ");
+				sb.append(project.getName());
+				log.info(sb.toString());
+
+				getTapestryIndexer().removeProjectFromIndex(project);
+			}
 		} else {
-			log.info("ResourceChanged: " + event.getType());
+			log.info("ResourceChanged type: " + (event.getType() == 4 ? "PRE_DELETE" : event.getType()));
 
 			/* DEBUG: code below might throw NPE
 			List<IProject> projects = getProjects(event.getDelta(), IResourceDelta.OPEN);
@@ -354,7 +382,7 @@ public class ResourceChangeListener implements IResourceChangeListener {
 				}
 			});
 		} catch (CoreException e) {
-			// handle error
+			log.info("Couldn't get projects: ", e);
 		}
 		return projects;
 	}
