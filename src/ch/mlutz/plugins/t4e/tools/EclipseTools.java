@@ -134,6 +134,27 @@ public class EclipseTools {
 	 * @param pageForNewEditor the page to open the editor with the file in
 	 * @param editorId
 	 * @return
+	 * @throws PartInitException
+	 */
+	public static IEditorPart openFileInEditorChecked(IFile fileToOpen,
+			IWorkbenchPage pageForNewEditor, String editorId)
+					throws PartInitException {
+
+		IEditorPart result= null;
+		if (pageForNewEditor != null) {
+			result= pageForNewEditor.openEditor(new FileEditorInput(fileToOpen),
+					editorId);
+		}
+		return result;
+	}
+
+	/**
+	 * Opens a new editor with the file to open in it.
+	 *
+	 * @param fileToOpen the file to be opened in the editor
+	 * @param pageForNewEditor the page to open the editor with the file in
+	 * @param editorId
+	 * @return
 	 */
 	public static IEditorPart openFileInEditor(IFile fileToOpen,
 			IWorkbenchPage pageForNewEditor, String editorId) {
