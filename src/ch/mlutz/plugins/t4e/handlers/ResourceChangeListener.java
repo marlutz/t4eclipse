@@ -21,10 +21,12 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.jobs.Job;
 
 import ch.mlutz.plugins.t4e.Activator;
 import ch.mlutz.plugins.t4e.index.TapestryIndex;
 import ch.mlutz.plugins.t4e.index.TapestryIndexer;
+import ch.mlutz.plugins.t4e.index.jobs.AddProjectToIndexJob;
 import ch.mlutz.plugins.t4e.log.EclipseLogFactory;
 import ch.mlutz.plugins.t4e.log.IEclipseLog;
 import ch.mlutz.plugins.t4e.tapestry.TapestryException;
@@ -62,6 +64,8 @@ public class ResourceChangeListener implements IResourceChangeListener {
 			log.info("Changed files count: " + files.size());
 
 			TapestryIndex tapestryIndex= getTapestryIndex();
+
+			// TODO: synchronize tapestryIndex itself
 			synchronized(tapestryIndex) {
 				for (IFile file: files) {
 
@@ -186,7 +190,9 @@ public class ResourceChangeListener implements IResourceChangeListener {
 				log.info(sb.toString());
 
 				for (IProject project: projects) {
-					getTapestryIndexer().addProjectToIndex(project, false);
+					// getTapestryIndexer().addProjectToIndex(project, false);
+					Job job= new AddProjectToIndexJob(project, getTapestryIndexer());
+					job.schedule();
 				}
 			}
 
@@ -198,6 +204,8 @@ public class ResourceChangeListener implements IResourceChangeListener {
 				for (IProject project: projects) {
 					sb.append(", ");
 					sb.append(project.getName());
+					// TODO: make job
+					getTapestryIndexer().removeProjectFromIndex(project);
 				}
 				log.info(sb.toString());
 			}
