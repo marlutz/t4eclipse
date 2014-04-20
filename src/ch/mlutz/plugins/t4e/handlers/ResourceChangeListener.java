@@ -277,7 +277,9 @@ public class ResourceChangeListener implements IResourceChangeListener {
 
 		// remove all elements of the module from tapestry
 		// index
-		getTapestryIndexer().removeModuleFromIndex(module);
+		if (module != null) {
+			getTapestryIndexer().removeModuleFromIndex(module);
+		}
 	}
 
 	private void handleComponentSpecification(TapestryIndex tapestryIndex,
