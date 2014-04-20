@@ -40,7 +40,10 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
 import ch.mlutz.plugins.t4e.Activator;
 import ch.mlutz.plugins.t4e.constants.Constants;
@@ -492,6 +495,28 @@ public class TapestryIndexer implements ITapestryModuleChangeListener {
                 + "exception: ", e);
         }
         return false;
+	}
+
+	public static void openFileInSpecificEditor(IFile file,
+			IWorkbenchPage activePage) {
+		try {
+			if (TapestryIndexer.isHtmlFile(file)) {
+				EclipseTools.openFileInEditorChecked(file, activePage,
+						Constants.TAPESTRY_EDITOR_ID);
+			} else {
+				IEditorDescriptor desc = PlatformUI.getWorkbench().
+						getEditorRegistry().getDefaultEditor(file.getName());
+
+				// use tapestry editor as default
+				String editorId= Constants.TAPESTRY_EDITOR_ID;
+				if (desc != null) {
+					editorId= desc.getId();
+				}
+				EclipseTools.openFileInEditorChecked(file, activePage, editorId);
+			}
+		} catch (PartInitException e) {
+			log.error("Couldn't open file in editor: ", e);
+		}
 	}
 
 	public TapestryIndex getTapestryIndex() {
