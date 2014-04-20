@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -54,6 +55,8 @@ import ch.mlutz.plugins.t4e.constants.Command;
 import ch.mlutz.plugins.t4e.constants.Constants;
 import ch.mlutz.plugins.t4e.index.TapestryIndex;
 import ch.mlutz.plugins.t4e.index.TapestryIndexer;
+import ch.mlutz.plugins.t4e.index.jobs.AddProjectToIndexJob;
+import ch.mlutz.plugins.t4e.index.jobs.SwitchToCorrespondingFileJob;
 import ch.mlutz.plugins.t4e.log.EclipseLogFactory;
 import ch.mlutz.plugins.t4e.log.IEclipseLog;
 import ch.mlutz.plugins.t4e.tapestry.TapestryModule;
@@ -118,7 +121,7 @@ public class CommandHandler extends AbstractHandler implements
 				// one of the workbench objects could not be retrieved
 				return null;
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error("Couldn't switch to corresponding file: ", e);
 			}
 		}
 
@@ -137,8 +140,14 @@ public class CommandHandler extends AbstractHandler implements
 
 		// check and add project to TapestryIndex if necessary
 		if (!tapestryIndex.contains(project)) {
-			tapestryIndexer.addProjectToIndex(project, currentFile, activePage, true);
-			log.info("Added project " + project.toString() + ".");
+			Job job= new AddProjectToIndexJob(project, tapestryIndexer);
+			job.schedule();
+
+			job= new SwitchToCorrespondingFileJob(currentFile, activePage, tapestryIndexer);
+			job.schedule();
+			// tapestryIndexer.addProjectToIndex(project, currentFile, activePage, true);
+
+			log.info("Adding project scheduled: " + project.toString() + ".");
 		} else {
 			// check if file is already in index ==> also catches Java files
 			IFile toFile= tapestryIndexer.getRelatedFile(currentFile);
