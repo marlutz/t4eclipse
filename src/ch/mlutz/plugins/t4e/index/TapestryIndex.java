@@ -434,10 +434,24 @@ public class TapestryIndex implements Serializable {
 		return Collections.unmodifiableSet(projects);
 	}
 
+	/**
+	 * Checks if the Tapestry Index contains the given project. When the index
+	 * contains a project, this means that either its modules have been added
+	 * to the index as well or that a job to add the modules is pending.
+	 *
+	 * @param project the project to check if it is in the index
+	 * @return true iff the index contains project
+	 */
 	public boolean contains(IProject project) {
 		return projects.contains(project);
 	}
 
+	/**
+	 * Adds a project to the TapestryIndex.
+	 *
+	 * @param project the project to add to the index.
+	 * @return
+	 */
 	public void add(IProject project) {
 		projects.add(project);
 	}
