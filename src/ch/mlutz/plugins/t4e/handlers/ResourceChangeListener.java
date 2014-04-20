@@ -64,6 +64,13 @@ public class ResourceChangeListener implements IResourceChangeListener {
 			TapestryIndex tapestryIndex= getTapestryIndex();
 			synchronized(tapestryIndex) {
 				for (IFile file: files) {
+
+					// ignore files the project of which is not in the
+					// TapestryIndex
+					if (!tapestryIndex.contains(file.getProject())) {
+						continue;
+					}
+
 					if (TapestryTools.isComponentSpecification(file)) {
 						handleComponentSpecification(tapestryIndex, file);
 					} else if (TapestryTools.isPageSpecification(file)) {
@@ -77,6 +84,13 @@ public class ResourceChangeListener implements IResourceChangeListener {
 				files= getFiles(event.getDelta(), IResourceDelta.ADDED);
 				log.info("Added files count: " + files.size());
 				for (IFile file: files) {
+
+					// ignore files the project of which is not in the
+					// TapestryIndex
+					if (!tapestryIndex.contains(file.getProject())) {
+						continue;
+					}
+
 					if (TapestryIndexer.isHtmlFile(file)) {
 						htmlFileAdded(file, tapestryIndex);
 					} else if (TapestryTools.isComponentSpecification(file)) {
@@ -99,6 +113,12 @@ public class ResourceChangeListener implements IResourceChangeListener {
 				files= getFiles(event.getDelta(), IResourceDelta.REMOVED);
 				log.info("Removed files count: " + files.size());
 				for (IFile file: files) {
+					// ignore files the project of which is not in the
+					// TapestryIndex
+					if (!tapestryIndex.contains(file.getProject())) {
+						continue;
+					}
+
 					if (TapestryIndexer.isHtmlFile(file)) {
 						htmlFileRemoved(file, tapestryIndex);
 					} else if (TapestryTools.isComponentSpecification(file)) {
