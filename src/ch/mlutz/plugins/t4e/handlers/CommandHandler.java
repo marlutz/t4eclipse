@@ -152,11 +152,7 @@ public class CommandHandler extends AbstractHandler implements
 			// check if file is already in index ==> also catches Java files
 			IFile toFile= tapestryIndexer.getRelatedFile(currentFile);
 			if (toFile != null) {
-				if (isHtmlFileChecked(toFile)) {
-					openFileInEditor(toFile, activePage, "ch.mlutz.plugins.t4e.editors.tapestryEditor");
-				} else {
-					openFileInEditor(toFile, activePage);
-				}
+				TapestryIndexer.openFileInSpecificEditor(toFile, activePage);
 				return;
 			}
 
@@ -168,7 +164,7 @@ public class CommandHandler extends AbstractHandler implements
 			}
 
 			if (toFile != null) {
-				openFileInEditor(toFile, activePage);
+				TapestryIndexer.openFileInSpecificEditor(toFile, activePage);
 				return;
 			}
 		}
