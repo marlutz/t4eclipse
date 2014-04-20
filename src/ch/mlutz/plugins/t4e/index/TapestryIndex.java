@@ -303,7 +303,9 @@ public class TapestryIndex implements Serializable {
 		webappFolderMap.clear();
 		modules.clear();
 		documentToFileMap.clear();
-		standardComponents.clear();
+		if (standardComponents != null) {
+			standardComponents.clear();
+		}
 	}
 
 	public void clear(IProject project) {
