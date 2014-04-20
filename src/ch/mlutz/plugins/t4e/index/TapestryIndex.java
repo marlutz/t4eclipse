@@ -379,8 +379,9 @@ public class TapestryIndex implements Serializable {
 				workspaceRoot,
 				IFile.class, IFile.class);
 
-		projects= EclipseSerializer.deserializeResourceSet(stream,
-				workspaceRoot, IProject.class);
+		projects= Collections.synchronizedSet(
+				EclipseSerializer.deserializeResourceSet(stream,
+				workspaceRoot, IProject.class));
 
 		// initialize transient variables
         appSpecificationParser= new AppSpecificationParser();
@@ -411,7 +412,7 @@ public class TapestryIndex implements Serializable {
 	 *
 	 */
 
-	private Set<IProject> projects= new HashSet<IProject>();
+	private Set<IProject> projects= Collections.synchronizedSet(new HashSet<IProject>());
 
 	private transient Map<IFile, Object> relationMap= new HashMap<IFile, Object>();
 
