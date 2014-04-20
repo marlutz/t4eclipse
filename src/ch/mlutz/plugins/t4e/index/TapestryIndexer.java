@@ -10,13 +10,9 @@
  ******************************************************************************/
 package ch.mlutz.plugins.t4e.index;
 
-import static ch.mlutz.plugins.t4e.tools.EclipseTools.extractFileExtension;
 import static ch.mlutz.plugins.t4e.tools.EclipseTools.openFileInEditor;
 import static ch.mlutz.plugins.t4e.tools.TapestryTools.isAppSpecification;
-import static ch.mlutz.plugins.t4e.tools.TapestryTools.isComponentSpecification;
 import static ch.mlutz.plugins.t4e.tools.TapestryTools.isHtmlFileChecked;
-import static ch.mlutz.plugins.t4e.tools.TapestryTools.isJavaFile;
-import static ch.mlutz.plugins.t4e.tools.TapestryTools.isPageSpecification;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -33,9 +29,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
