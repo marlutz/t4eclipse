@@ -13,10 +13,8 @@ package ch.mlutz.plugins.t4e.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -54,20 +52,24 @@ public class RefreshHandler extends AbstractHandler
 		// set structured selection
 		IStructuredSelection structured = (IStructuredSelection) service.getSelection();
 
-		//check if it is an IFile
-		if (structured.getFirstElement() instanceof IProject) {
-			IProject project= (IProject) structured.getFirstElement();
-			TapestryIndexer tapestryIndexer= Activator.getDefault()
-					.getTapestryIndexer();
-			if (event.getCommand().getId().equals(Command.REFRESH)) {
-				log.info("Refresh one project.");
-				tapestryIndexer.removeProjectFromIndex(project);
-				tapestryIndexer.addProjectToIndex(project);
-			} else if (event.getCommand().getId().equals(
-					Command.CLEAR_TAPESTRY_INDEX)) {
-				log.info("Refresh all projects.");
-				Activator.getDefault().getTapestryIndex().clear();
+		TapestryIndexer tapestryIndexer= Activator.getDefault()
+				.getTapestryIndexer();
+		if (event.getCommand().getId().equals(Command.REFRESH)) {
+			log.info("Refresh one project.");
+
+			IProject project= null;
+			if (structured.getFirstElement() instanceof IProject) {
+				project= (IProject) structured.getFirstElement();
+			} else if (structured.getFirstElement() instanceof IJavaProject) {
+				project= ((IJavaProject) structured.getFirstElement()).getProject();
 			}
+
+			tapestryIndexer.removeProjectFromIndex(project);
+			tapestryIndexer.addProjectToIndex(project);
+		} else if (event.getCommand().getId().equals(
+				Command.CLEAR_TAPESTRY_INDEX)) {
+			log.info("Cleared Tapestry index.");
+			Activator.getDefault().getTapestryIndex().clear();
 		}
 
 		/*
