@@ -127,6 +127,10 @@ public class TapestryHyperlinkDetector extends AbstractHyperlinkDetector {
 
 		TapestryModule module= tapestryIndex.getModuleForResource(documentFile);
 
+		if (module == null) {
+			return ognlHyperlinkDetector.detectHyperlinks(viewer, region, canHandleMultipleLinks);
+		}
+
 		TapestryHtmlElement linkedComponent= null;
 		for (TapestryHtmlElement component: module.getComponents()) {
 			if (hyperlinkText.equals(component.getPath())) {
