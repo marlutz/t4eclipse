@@ -13,10 +13,13 @@ package ch.mlutz.plugins.t4e.index.jobs;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 
 import ch.mlutz.plugins.t4e.index.TapestryIndex;
@@ -69,9 +72,13 @@ public class AddProjectToIndexJob extends Job {
 		this.tapestryIndexer= tapestryIndexer;
 		this.tapestryIndex= tapestryIndexer.getTapestryIndex();
 
-		setRule(new TapestrySchedulingRule(projectToAdd));
+		ISchedulingRule tapestrySchedulingRule= new TapestrySchedulingRule(
+				projectToAdd);
+
+		setRule(tapestrySchedulingRule);
 		setUser(false);
 		setPriority(Job.LONG);
+
 	}
 
 	/* (non-Javadoc)
@@ -99,6 +106,9 @@ public class AddProjectToIndexJob extends Job {
 			monitor.worked(100);
 			monitor.setTaskName(TASK_NAME_CREATING_MODULES + projectToAdd.getName());
 
+			waitForFamily(ResourcesPlugin.FAMILY_AUTO_REFRESH);
+			waitForFamily(ResourcesPlugin.FAMILY_AUTO_BUILD);
+
 			List<TapestryModule> modulesToAdd= tapestryIndexer
 					.createModulesForProject(projectToAdd);
 				log.info("Found " + modulesToAdd.size() + " modules to add to " + projectToAdd.getName());
@@ -125,4 +135,21 @@ public class AddProjectToIndexJob extends Job {
 		}
 		return Status.OK_STATUS;
 	}
+
+	protected static void waitForFamily(Object family) {
+	    boolean wasInterrupted = false;
+	    do {
+	      try {
+	        Job.getJobManager().join(family, null);
+	        wasInterrupted = false;
+	      }
+	      catch (OperationCanceledException e) {
+	        e.printStackTrace();
+	      }
+	      catch (InterruptedException e) {
+	        wasInterrupted = true;
+	      }
+	    }
+	    while (wasInterrupted);
+	  }
 }
