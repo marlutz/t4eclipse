@@ -352,6 +352,8 @@ public class TapestryIndexer implements ITapestryModuleChangeListener {
 		for (TapestryModule module: toRemove) {
 			removeModuleFromIndex(module);
 		}
+
+		getTapestryIndex().remove(project);
 	}
 
     /**
