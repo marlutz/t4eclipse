@@ -10,12 +10,6 @@
  ******************************************************************************/
 package ch.mlutz.plugins.t4e.handlers;
 
-import static ch.mlutz.plugins.t4e.tools.EclipseTools.openFileInEditor;
-import static ch.mlutz.plugins.t4e.tools.TapestryTools.isHtmlFileChecked;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -23,30 +17,19 @@ import org.eclipse.core.commands.IExecutionListener;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISelectionService;
-import org.eclipse.ui.IStartup;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -60,7 +43,6 @@ import ch.mlutz.plugins.t4e.index.jobs.SwitchToCorrespondingFileJob;
 import ch.mlutz.plugins.t4e.log.EclipseLogFactory;
 import ch.mlutz.plugins.t4e.log.IEclipseLog;
 import ch.mlutz.plugins.t4e.tapestry.TapestryModule;
-import ch.mlutz.plugins.t4e.tools.TapestryTools;
 
 /**
  * Our sample handler extends AbstractHandler, an IHandler base class.
