@@ -122,7 +122,7 @@ public class CommandHandler extends AbstractHandler implements
 
 		// check and add project to TapestryIndex if necessary
 		if (!tapestryIndex.contains(project)) {
-			Job job= new AddProjectToIndexJob(project, tapestryIndexer);
+			Job job= new AddProjectToIndexJob(project, tapestryIndexer, false);
 			job.schedule();
 
 			job= new SwitchToCorrespondingFileJob(currentFile, activePage, tapestryIndexer);

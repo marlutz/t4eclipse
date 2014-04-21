@@ -191,7 +191,8 @@ public class ResourceChangeListener implements IResourceChangeListener {
 
 				for (IProject project: projects) {
 					// getTapestryIndexer().addProjectToIndex(project, false);
-					Job job= new AddProjectToIndexJob(project, getTapestryIndexer());
+					Job job= new AddProjectToIndexJob(project,
+							getTapestryIndexer(), true);
 					job.schedule();
 				}
 			}

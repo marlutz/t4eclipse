@@ -60,16 +60,21 @@ public class AddProjectToIndexJob extends Job {
 
 	private final TapestryIndex tapestryIndex;
 
+	private final boolean waitForRefreshesAndBuilds;
+
 	/**
 	 * @param projectToAdd the project to be added to the TapestryIndex
 	 * @param tapestryIndexer the TapestryIndexer instance to be used to add the
 	 * 		project
 	 */
 	public AddProjectToIndexJob(IProject projectToAdd,
-			TapestryIndexer tapestryIndexer) {
+			TapestryIndexer tapestryIndexer,
+			boolean waitForRefreshesAndBuilds) {
 		super(TASK_NAME_UPDATE_TAPESTRY_INDEX);
 		this.projectToAdd= projectToAdd;
 		this.tapestryIndexer= tapestryIndexer;
+		this.waitForRefreshesAndBuilds= waitForRefreshesAndBuilds;
+
 		this.tapestryIndex= tapestryIndexer.getTapestryIndex();
 
 		ISchedulingRule tapestrySchedulingRule= new TapestrySchedulingRule(
@@ -106,8 +111,10 @@ public class AddProjectToIndexJob extends Job {
 			monitor.worked(100);
 			monitor.setTaskName(TASK_NAME_CREATING_MODULES + projectToAdd.getName());
 
-			waitForFamily(ResourcesPlugin.FAMILY_AUTO_REFRESH);
-			waitForFamily(ResourcesPlugin.FAMILY_AUTO_BUILD);
+			if (waitForRefreshesAndBuilds) {
+				waitForFamily(ResourcesPlugin.FAMILY_AUTO_REFRESH);
+				waitForFamily(ResourcesPlugin.FAMILY_AUTO_BUILD);
+			}
 
 			List<TapestryModule> modulesToAdd= tapestryIndexer
 					.createModulesForProject(projectToAdd);
