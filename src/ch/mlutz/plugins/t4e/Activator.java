@@ -96,17 +96,15 @@ public class Activator extends AbstractUIPlugin {
 				ObjectInput ois= new ObjectInputStream(bis);
 				try {
 					tapestryIndex= (TapestryIndex) ois.readObject();
-				} catch (Exception e) {
-				    log.warn("Couldn't deserialize tapestryIndex, might be"
-				        + " corrupt: ", e);
-				}
-				finally {
+				} finally {
 					ois.close();
+					bis.close();
+					fis.close();
 				}
-			}
-			catch (IOException ex) {
-				getLog().log(new Status(Status.ERROR, Constants.PLUGIN_ID,
-						Status.OK, "Cannot perform tapestryIndex read.", ex));
+			} catch (Exception e) {
+			    log.error("Couldn't deserialize tapestryIndex, might be"
+			        + " corrupt: ", e);
+			    tapestryIndex= null;
 			}
 		}
 
