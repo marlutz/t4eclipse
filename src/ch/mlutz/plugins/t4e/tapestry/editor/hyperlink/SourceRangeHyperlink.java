@@ -13,6 +13,7 @@ package ch.mlutz.plugins.t4e.tapestry.editor.hyperlink;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbench;
@@ -47,22 +48,28 @@ public class SourceRangeHyperlink implements IHyperlink {
 	private String editorId;
 
 	/**
+	 * an additional offset to shift the hyperlinkRegion by
+	 */
+	private int partitionOffset= 0;
+
+	/**
 	 * Constructor
 	 *
-	 * @param hyperlinkRegion
-	 * @param hyperlinkText
-	 * @param targetFile
-	 * @param targetSourceRange
-	 * @param editorId
+	 * @param hyperlinkRegion the hyperlink's region
+	 * @param hyperlinkText the hyperlink's label
+	 * @param targetFile the file to open on hyperlink click
+	 * @param targetSourceRange the range to highlight after opening the file;
+	 * 		null for no text highlighting
+	 * @param editorId the id of the editor to open the file in
 	 */
 	public SourceRangeHyperlink(IRegion hyperlinkRegion, String hyperlinkText,
 			IFile targetFile, ISourceRange targetSourceRange, String editorId) {
 		super();
-		this.hyperlinkRegion = hyperlinkRegion;
-		this.hyperlinkText = hyperlinkText;
-		this.targetFile = targetFile;
-		this.targetSourceRange = targetSourceRange;
-		this.editorId = editorId;
+		this.hyperlinkRegion=	hyperlinkRegion;
+		this.hyperlinkText=		hyperlinkText;
+		this.targetFile=		targetFile;
+		this.targetSourceRange=	targetSourceRange;
+		this.editorId= 			editorId;
 	}
 
 	@Override
@@ -103,6 +110,21 @@ public class SourceRangeHyperlink implements IHyperlink {
 
 	@Override
 	public IRegion getHyperlinkRegion() {
-		return hyperlinkRegion;
+		if (partitionOffset == 0) {
+			return hyperlinkRegion;
+		} else {
+			return new Region(hyperlinkRegion.getOffset() + partitionOffset,
+					hyperlinkRegion.getLength());
+		}
+	}
+
+	// getters and setters
+
+	public int getPartitionOffset() {
+		return partitionOffset;
+	}
+
+	public void setPartitionOffset(int partitionOffset) {
+		this.partitionOffset= partitionOffset;
 	}
 }
