@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ui.commands">
       <category
-            name="TapestryCategory"
+            name="T4Eclipse"
             id="ch.mlutz.plugins.t4e.commands.category.tapestry">
       </category>
       <command
