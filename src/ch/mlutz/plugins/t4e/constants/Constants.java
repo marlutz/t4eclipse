@@ -10,19 +10,21 @@
  ******************************************************************************/
 package ch.mlutz.plugins.t4e.constants;
 
+import ch.mlutz.plugins.t4e.i18n.Messages;
+
 public interface Constants {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "ch.mlutz.plugins.t4e"; //$NON-NLS-1$
 
 	// the plugin display name e.g. for message box titles
-	public static final String PLUGIN_DISPLAYNAME= "Tapestry Plugin";
+	public static final String PLUGIN_DISPLAYNAME= Messages.getString("plugin.displayname"); //$NON-NLS-1$
 
 	// the classpath container id
 	public static final String CONTAINER_ID= PLUGIN_ID + ".container.T4E_CLASSPATH_CONTAINER"; //$NON-NLS-1$
 
 	// the tapestry editor id
-	public static final String TAPESTRY_EDITOR_ID= PLUGIN_ID + ".editors.tapestryEditor";
+	public static final String TAPESTRY_EDITOR_ID= PLUGIN_ID + ".editors.tapestryEditor"; //$NON-NLS-1$
 
 	public static final int MAX_PROPOSAL_LOOKBEHIND_LENGTH= 255;
 }
