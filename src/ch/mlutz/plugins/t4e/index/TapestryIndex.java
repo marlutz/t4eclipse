@@ -22,6 +22,8 @@ package ch.mlutz.plugins.t4e.index;
 import static ch.mlutz.plugins.t4e.tools.EclipseTools.extractFileBase;
 import static ch.mlutz.plugins.t4e.tools.EclipseTools.getPackageFragmentRoots;
 import static ch.mlutz.plugins.t4e.tools.StringTools.join;
+import static ch.mlutz.plugins.t4e.tapestry.element.ParameterDirection.*;
+import static ch.mlutz.plugins.t4e.tapestry.element.ParameterType.*;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -56,6 +58,8 @@ import ch.mlutz.plugins.t4e.log.IEclipseLog;
 import ch.mlutz.plugins.t4e.serializer.EclipseSerializer;
 import ch.mlutz.plugins.t4e.tapestry.TapestryModule;
 import ch.mlutz.plugins.t4e.tapestry.element.IComponent;
+import ch.mlutz.plugins.t4e.tapestry.element.Parameter;
+import ch.mlutz.plugins.t4e.tapestry.element.ParameterType;
 import ch.mlutz.plugins.t4e.tapestry.element.StandardComponent;
 import ch.mlutz.plugins.t4e.tapestry.parsers.AppSpecificationParser;
 import ch.mlutz.plugins.t4e.tapestry.parsers.SpecificationParser;
@@ -676,13 +680,56 @@ public class TapestryIndex implements Serializable {
 	public synchronized List<IComponent> getStandardComponents() {
 		if (standardComponents == null) {
 			String[] componentJwcIds= new String[] {
-				"Insert", "Any", "If", "For", "Else", "Image", "InsertText", "Script",
+				"Else", "Image", "InsertText", "Script",
 				"ScriptIncludes", "Style", "Frame", "Shell",
 				"Block", "Body", "Delegator", "InvokeListener",
 				"Describe", "ExceptionDisplay", "Relation", "RenderBlock", "RenderBody"
 			};
 
 			standardComponents= new ArrayList<IComponent>();
+
+			standardComponents.add(
+					new StandardComponent("Insert",
+							new Parameter("value", OBJECT, IN, false, null),
+							new Parameter("format", FORMAT, IN, false, null),
+							new Parameter("class", STRING, IN, false, null),
+							new Parameter("raw", BOOLEAN, IN, false, Boolean.FALSE)
+					)
+			);
+
+			standardComponents.add(
+					new StandardComponent("Any",
+							new Parameter("element", STRING, IN, false, null)
+					)
+			);
+
+			standardComponents.add(
+					new StandardComponent("If",
+							new Parameter("condition", BOOLEAN, IN, true, null),
+							new Parameter("conditionvalue", BOOLEAN, IN, false, null),
+							new Parameter("listener", LISTENER, IN, false, null),
+							new Parameter("renderTag", BOOLEAN, IN, false, Boolean.TRUE),
+							new Parameter("element", STRING, IN, false, null),
+							new Parameter("volatile", BOOLEAN, IN, false, Boolean.FALSE)
+					)
+			);
+
+			standardComponents.add(
+					new StandardComponent("For",
+							new Parameter("source", COLLECTION, IN, true, null),
+							new Parameter("value", OBJECT, OUT, false, null),
+							new Parameter("index", INTEGER, OUT, false, null),
+							new Parameter("renderTag", BOOLEAN, IN, false, Boolean.TRUE),
+							new Parameter("element", STRING, IN, false, null),
+							new Parameter("keyExpression", STRING, IN, false, null),
+							new Parameter("fullSource", COLLECTION, IN, false, null),
+							new Parameter("defaultValue", OBJECT, IN, false, null),
+							new Parameter("converter", PRIMARYKEYCONVERTER, IN, false, null),
+							new Parameter("primaryKeys", COLLECTION, OUT, false, null),
+							new Parameter("match", BOOLEAN, IN, false, Boolean.TRUE),
+							new Parameter("volatile", BOOLEAN, IN, false, Boolean.FALSE)
+					)
+			);
 
 			for (String jwcId: componentJwcIds) {
 				StandardComponent component= new StandardComponent(jwcId);
