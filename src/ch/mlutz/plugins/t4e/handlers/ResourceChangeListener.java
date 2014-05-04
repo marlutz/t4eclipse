@@ -55,7 +55,7 @@ public class ResourceChangeListener implements IResourceChangeListener {
 	 */
 	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
-		boolean logFileChanges= true;
+		boolean logFileChanges= false;
 		boolean logProjectChanges= true;
 		boolean logOtherChanges= false;
 
@@ -86,7 +86,10 @@ public class ResourceChangeListener implements IResourceChangeListener {
 				}
 
 				files= getFiles(event.getDelta(), IResourceDelta.ADDED);
-				log.info("Added files count: " + files.size());
+				if (logFileChanges) {
+					log.info("Added files count: " + files.size());
+				}
+
 				for (IFile file: files) {
 
 					// ignore files the project of which is not in the
@@ -115,7 +118,10 @@ public class ResourceChangeListener implements IResourceChangeListener {
 				}
 
 				files= getFiles(event.getDelta(), IResourceDelta.REMOVED);
-				log.info("Removed files count: " + files.size());
+				if (logFileChanges) {
+					log.info("Removed files count: " + files.size());
+				}
+
 				for (IFile file: files) {
 					// ignore files the project of which is not in the
 					// TapestryIndex
