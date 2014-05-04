@@ -22,11 +22,3 @@ public class TapestryEditor extends TextEditor {
 	}
 
 }
-
-
-/*
-
-extension point 'org.eclipse.ui.workbench.texteditor.hyperlinkDetectors'
-classes org.eclipse.jface.text.hyperlink.AbstractHyperlinkDetector, org.eclipse.jface.text.hyperlink.IHyperlinkDetector and org.eclipse.jface.text.hyperlink.IHyperlink
-
-*/
