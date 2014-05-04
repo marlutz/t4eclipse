@@ -35,8 +35,13 @@ public class StandardComponent extends TapestryElement
 
 	private List<Parameter> parameters= new ArrayList<Parameter>();
 
-	public StandardComponent(String name) {
+	public StandardComponent(String name, Parameter... parameters) {
 		this.name= name;
+
+		for (Parameter p: parameters) {
+			p.setParent(this);
+			this.parameters.add(p);
+		}
 	}
 
 	public void addParameter(Parameter parameter) {
@@ -44,7 +49,6 @@ public class StandardComponent extends TapestryElement
 	}
 
 	public List<Parameter> getParameters() {
-		@SuppressWarnings("unchecked")
 		List<Parameter> unmodifiableList = Collections.unmodifiableList(parameters);
 		return unmodifiableList;
 	}
