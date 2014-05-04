@@ -40,6 +40,8 @@ public class TapestryStringProposalComputer implements IJavaCompletionProposalCo
 	private static final IEclipseLog log=
 			EclipseLogFactory.create(TapestryProposalComputer.class);
 
+	protected static final boolean LOG_VERBOSE= false;
+
 	// the minimum prefix length for proposals
 	private static final int MINIMUM_PREFIX_LENGTH= 1;
 
@@ -194,12 +196,16 @@ public class TapestryStringProposalComputer implements IJavaCompletionProposalCo
 
 	@Override
 	public void sessionEnded() {
-		log.info("TapestryProposalComputer.sessionEnded()");
+		if (LOG_VERBOSE) {
+			log.info("TapestryStringProposalComputer.sessionEnded()");
+		}
 	}
 
 	@Override
 	public void sessionStarted() {
-		log.info("TapestryProposalComputer.sessionStarted()");
+		if (LOG_VERBOSE) {
+			log.info("TapestryStringProposalComputer.sessionStarted()");
+		}
 	}
 }
 
