@@ -10,6 +10,11 @@
  ******************************************************************************/
 package ch.mlutz.plugins.t4e.tools;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class StringTools {
 	/**
 	 * Joins a collection of strings to a big string, using glue between them
@@ -38,6 +43,37 @@ public class StringTools {
 		if (lastIndexOfDoubleQuotes >= 0) {
 			result= s.substring(lastIndexOfDoubleQuotes + 1);
 		}
+		return result;
+	}
+
+	public static String stripRedundantTagWhitespace(String tagString) {
+		String result= tagString.replaceAll("\\s*=\\s*\"", "=\"");
+
+		result= result.replaceAll("\\s+>", ">");
+
+		result= result.replaceAll("[\\n\\r]", " ");
+
+		String newResult;
+		while (true) {
+			newResult= result.replaceAll("^([^\"]*(?:\"[^\"]*\")[^\"]*\\s)\\s+", "$1");
+			if (newResult.equals(result)) break;
+			result= newResult;
+		}
+
+		return result;
+	}
+
+	public static Map<String, String> extractAttributeMap(String tagString) {
+		Map<String, String> result= new HashMap<String, String>();
+		tagString= stripRedundantTagWhitespace(tagString);
+
+		Matcher attributeMatcher= Pattern
+				.compile("\\s([^\\s=\"]+)(?:=\"([^\"]*)\")").matcher(tagString);
+
+		while (attributeMatcher.find()) {
+			result.put(attributeMatcher.group(1), attributeMatcher.group(2));
+		}
+
 		return result;
 	}
 }
