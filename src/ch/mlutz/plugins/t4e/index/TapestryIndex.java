@@ -738,4 +738,13 @@ public class TapestryIndex implements Serializable {
 		}
 		return standardComponents;
 	}
+
+	public Map<String, IComponent> getStandardComponentMap() {
+		Map<String, IComponent> result= new HashMap<String, IComponent>();
+		List<IComponent> standardComponents= getStandardComponents();
+		for (IComponent c: standardComponents) {
+			result.put(c.getName(), c);
+		}
+		return result;
+	}
 }
