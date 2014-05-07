@@ -19,8 +19,24 @@ package ch.mlutz.plugins.t4e.tapestry.element;
  */
 // TODO: add type-dependent comparator for completion options
 public enum ParameterType {
-	STRING, OBJECT, BOOLEAN, LISTENER, COLLECTION, INTEGER, DATE, FORMAT,
-	VALIDATOR, TRANSLATOR, ASSET, COMPONENT, RENDER, EXCEPTIONDESCRIPTION,
-	PRIMARYKEYCONVERTER, VALIDATIONDELEGATE, SUBMITTYPE, POINT, INSERTTEXTMODE,
-	NAMESPACE, STRING_OR_ASSET, BLOCK, MAP, STRING_OR_COLLECTION, UPLOADFILE;
+	STRING("String"), OBJECT("Object"), BOOLEAN("Boolean"),
+	LISTENER("Listener"), COLLECTION("Collection"), INTEGER("Integer"),
+	DATE("Date"), FORMAT("Format"), VALIDATOR("Validator"),
+	TRANSLATOR("Translator"), ASSET("Asset"), COMPONENT("Component"),
+	RENDER("Render"), EXCEPTIONDESCRIPTION("ExceptionDescription"),
+	PRIMARYKEYCONVERTER("PrimaryConverter"),
+	VALIDATIONDELEGATE("ValidationDelegate"), SUBMITTYPE("SubmitType"),
+	POINT("Point"), INSERTTEXTMODE("InsertTextMode"), NAMESPACE("Namespace"),
+	STRING_OR_ASSET("String or Asset"), BLOCK("Block"), MAP("Map"),
+	STRING_OR_COLLECTION("String or Collection"), UPLOADFILE("UploadFile");
+
+	private String value;
+
+	private ParameterType(String value) {
+		this.value= value;
+	}
+
+	public String getValue() {
+		return value;
+	}
 }
