@@ -49,6 +49,7 @@ import ch.mlutz.plugins.t4e.tools.StringTools;
 import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import ch.mlutz.plugins.t4e.tools.stringfilter.IStringListFilter;
 
 public class TagContentAssistProcessor implements IContentAssistProcessor {
 
@@ -77,8 +78,13 @@ public class TagContentAssistProcessor implements IContentAssistProcessor {
 	private static final Pattern signaturePattern=
 			Pattern.compile(SIGNATURE_PATTERN_STRING);
 
+	private IStringListFilter completionProposalFilter;
+
 	// ctor
-	public TagContentAssistProcessor(TapestryTagScanner xmlTagScanner) {}
+	public TagContentAssistProcessor(
+			IStringListFilter completionProposalFilter) {
+		this.completionProposalFilter= completionProposalFilter;
+	}
 
 	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer,
@@ -461,5 +467,18 @@ public class TagContentAssistProcessor implements IContentAssistProcessor {
 			}
 		}
 
+	}
+
+	public Parameter getJwcidParameter() {
+		return new Parameter("jwcid", ParameterType.STRING, ParameterDirection.IN, false, null);
+	}
+
+	public IStringListFilter getCompletionProposalFilter() {
+		return completionProposalFilter;
+	}
+
+	public void setCompletionProposalFilter(
+			IStringListFilter completionProposalFilter) {
+		this.completionProposalFilter = completionProposalFilter;
 	}
 }
