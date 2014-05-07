@@ -26,6 +26,7 @@ import ch.mlutz.plugins.t4e.tapestry.editor.hyperlink.DelegatingHyperlinkDetecto
 import ch.mlutz.plugins.t4e.tapestry.editor.hyperlink.IHyperlinkDetectorDelegate;
 import ch.mlutz.plugins.t4e.tapestry.editor.hyperlink.JwcidHyperlinkDetectorDelegate;
 import ch.mlutz.plugins.t4e.tapestry.editor.hyperlink.OgnlHyperlinkDetectorDelegate;
+import ch.mlutz.plugins.t4e.tools.stringfilter.PrefixStringListFilter;
 
 public class TapestryConfiguration extends TextSourceViewerConfiguration {
 
@@ -121,7 +122,7 @@ public class TapestryConfiguration extends TextSourceViewerConfiguration {
 		ContentAssistant assistant = new ContentAssistant();
 
 		IContentAssistProcessor tagContentAssistProcessor
-			= new TagContentAssistProcessor(getXMLTagScanner());
+			= new TagContentAssistProcessor(new PrefixStringListFilter());
 		assistant.setContentAssistProcessor(tagContentAssistProcessor,
 				TapestryPartitionScanner.XML_TAG);
 		assistant.enableAutoActivation(true);
