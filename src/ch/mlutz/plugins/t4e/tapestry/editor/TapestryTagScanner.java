@@ -6,10 +6,6 @@ import org.eclipse.jface.text.rules.*;
 public class TapestryTagScanner extends RuleBasedScanner {
 
 	public TapestryTagScanner(ColorManager manager) {
-		IToken string =
-			new Token(
-				new TextAttribute(manager.getColor(IXMLColorConstants.STRING)));
-
 		IToken dqAttr =
 				new Token(
 					new TextAttribute(manager.getColor(IXMLColorConstants.DQ_ATTR)));

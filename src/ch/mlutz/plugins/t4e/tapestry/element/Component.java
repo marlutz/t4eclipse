@@ -50,7 +50,6 @@ public class Component extends TapestryHtmlElement implements IComponent {
 	}
 
 	public List<Parameter> getParameters() {
-		@SuppressWarnings("unchecked")
 		List<Parameter> unmodifiableList = Collections.unmodifiableList(parameters);
 		return unmodifiableList;
 	}

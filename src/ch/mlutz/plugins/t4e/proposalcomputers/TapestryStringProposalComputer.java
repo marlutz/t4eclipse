@@ -42,9 +42,6 @@ public class TapestryStringProposalComputer implements IJavaCompletionProposalCo
 
 	protected static final boolean LOG_VERBOSE= false;
 
-	// the minimum prefix length for proposals
-	private static final int MINIMUM_PREFIX_LENGTH= 1;
-
 	private static final String[] proposalStrings= new String[] {};
 
 	private static final int maxProposalStringLength= 100;

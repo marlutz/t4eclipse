@@ -145,10 +145,6 @@ public class TapestryHyperlinkDetector extends AbstractHyperlinkDetector {
 		}
 		*/
 
-		IWorkbench wb = PlatformUI.getWorkbench();
-		   IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-		final   IWorkbenchPage page = win.getActivePage();
-
 		SourceRangeHyperlink hyperlink;
 
 		if (finalLinkedComponent != null) {

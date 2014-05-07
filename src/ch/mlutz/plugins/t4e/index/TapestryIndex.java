@@ -109,14 +109,6 @@ public class TapestryIndex implements Serializable {
 	 */
 	private static final long serialVersionUID = -4467549554390808167L;
 
-	private static final String WEBAPP_FOLDER_NAME= "webapp";
-
-	// Debug
-	private static final boolean UPDATE_VERBOSE= false;
-
-	// transient member variables
-	private transient AppSpecificationParser appSpecificationParser= new AppSpecificationParser();
-
 	/*
 	private Set<IFile> webDeploymentDescriptors= new HashSet<IFile>();
 	private IFile mainWebDeploymentDescriptor= null;
@@ -384,9 +376,6 @@ public class TapestryIndex implements Serializable {
 		projects= Collections.synchronizedSet(
 				EclipseSerializer.deserializeResourceSet(stream,
 				workspaceRoot, IProject.class));
-
-		// initialize transient variables
-        appSpecificationParser= new AppSpecificationParser();
 
         relationMap= new HashMap<IFile, Object>();
 

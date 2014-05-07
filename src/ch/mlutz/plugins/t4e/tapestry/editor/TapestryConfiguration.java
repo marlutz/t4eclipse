@@ -25,10 +25,6 @@ import ch.mlutz.plugins.t4e.tapestry.editor.hyperlink.OgnlHyperlinkDetectorDeleg
 import ch.mlutz.plugins.t4e.tools.stringfilter.PrefixStringListFilter;
 
 public class TapestryConfiguration extends TextSourceViewerConfiguration {
-
-	private static final IEclipseLog log=
-			EclipseLogFactory.create(TapestryConfiguration.class);
-
 	private TapestryDoubleClickStrategy doubleClickStrategy;
 	private TapestryTagScanner tagScanner;
 	private TapestryScanner scanner;
