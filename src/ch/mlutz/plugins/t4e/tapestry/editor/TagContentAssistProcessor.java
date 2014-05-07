@@ -97,7 +97,6 @@ public class TagContentAssistProcessor implements IContentAssistProcessor {
 			int caretOffset) {
 		IDocument document= viewer.getDocument();
 		String attributePrefix= "";
-		List<ICompletionProposal> result= new ArrayList<ICompletionProposal>();
 
 		try {
 			int lineIndex= document.getLineOfOffset(caretOffset);
@@ -169,14 +168,43 @@ public class TagContentAssistProcessor implements IContentAssistProcessor {
 			IDocument document,
 			IFile documentFile) {
 		List<ICompletionProposal> result= new ArrayList<ICompletionProposal>();
+
+		ITypedRegion partition= null;
+		try {
+			partition= document.getPartition(offset);
+		} catch(BadLocationException e) {
+			log.warn("Could not compute content assist: ", e);
+			return result.toArray(new ICompletionProposal[result.size()]);
+		}
+
+		// get the partition's content
+		String partitionContent;
+		try {
+			partitionContent= document.get(partition.getOffset(),
+					partition.getLength());
+		} catch (BadLocationException e) {
+			log.warn("Could not compute content assist:",
+					e);
+			return null;
+		}
+
+		String contentAfter= partitionContent.substring(offset - partition.getOffset());
+
 		int jwcIdPrefixLength= jwcIdPrefix.length();
 
 		if (documentFile != null) {
+
+			String suffix= "\"";
+			if (contentAfter.matches("(?s)^\"(?![\"\\w]).*")) {
+				// a " follows immediately after the caret, so don't add a closing "
+				suffix= "";
+			}
+
 			String[] jwcIds= getJwcIds(documentFile);
 			for (String jwcId: jwcIds) {
 				if (jwcId.startsWith(jwcIdPrefix)) {
 					result.add(
-							new CompletionProposal(jwcId + "\"",
+							new CompletionProposal(jwcId + suffix,
 									offset - jwcIdPrefixLength,
 									jwcIdPrefixLength,
 									jwcId.length() + 1,
@@ -237,6 +265,7 @@ public class TagContentAssistProcessor implements IContentAssistProcessor {
 			Map<ICompletionProposal, Integer> proposalScoreMap=
 					new HashMap<ICompletionProposal, Integer>();
 
+			// TODO: improve this suffix computation as in computeAttributeCompletionProposals
 			String suffix= "\"";
 			int additionalCursorOffset= 1;
 			try {
