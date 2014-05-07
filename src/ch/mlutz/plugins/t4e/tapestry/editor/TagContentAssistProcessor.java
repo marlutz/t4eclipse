@@ -11,12 +11,16 @@
 package ch.mlutz.plugins.t4e.tapestry.editor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -41,6 +45,8 @@ import ch.mlutz.plugins.t4e.log.EclipseLogFactory;
 import ch.mlutz.plugins.t4e.log.IEclipseLog;
 import ch.mlutz.plugins.t4e.tapestry.TapestryModule;
 import ch.mlutz.plugins.t4e.tapestry.element.IComponent;
+import ch.mlutz.plugins.t4e.tapestry.element.Parameter;
+import ch.mlutz.plugins.t4e.tapestry.element.ParameterDirection;
 import ch.mlutz.plugins.t4e.tapestry.element.ParameterType;
 import ch.mlutz.plugins.t4e.tapestry.element.TapestryHtmlElement;
 import ch.mlutz.plugins.t4e.tools.CollectionTools;
@@ -307,6 +313,116 @@ public class TagContentAssistProcessor implements IContentAssistProcessor {
 				e.printStackTrace();
 			}
 			Collections.sort(result, new ScoreComparator<Integer>(proposalScoreMap));
+		}
+
+		return result.toArray(new ICompletionProposal[result.size()]);
+	}
+
+	protected ICompletionProposal[] computeAttributeCompletionProposals(
+			int offset,
+			IDocument document,
+			IFile documentFile) {
+		List<ICompletionProposal> result= new ArrayList<ICompletionProposal>();
+
+		ITypedRegion partition= null;
+		try {
+			partition= document.getPartition(offset);
+		} catch(BadLocationException e) {
+			log.warn("Could not compute content assist: ", e);
+			return result.toArray(new ICompletionProposal[result.size()]);
+		}
+
+		// get the partition's content
+		String partitionContent;
+		try {
+			partitionContent= document.get(partition.getOffset(),
+					partition.getLength());
+		} catch (BadLocationException e) {
+			log.warn("Could not compute content assist:",
+					e);
+			return null;
+		}
+
+		String contentBefore= partitionContent.substring(0, offset - partition.getOffset());
+		String contentAfter= partitionContent.substring(offset - partition.getOffset());
+
+		// check that we are not in an attribute value, since we don't want
+		// completion proposals in there
+		if (StringUtils.countMatches(contentBefore, "\"") % 2 != 0) {
+			return null;
+		}
+
+		String attributePrefix= "";
+		Matcher attributePrefixMatcher= Pattern.compile("([^\\s<>\"]*)$")
+				.matcher(contentBefore);
+
+		if (attributePrefixMatcher.find()) {
+			attributePrefix= attributePrefixMatcher.group(1);
+		}
+
+		Map<String, String> attributeMap= StringTools.extractAttributeMap(
+				partitionContent);
+
+		String jwcId= attributeMap.get("jwcid");
+		List<Parameter> parameterList;
+		if (jwcId != null) {
+			String[] componentIdArray= jwcId.split("@");
+			String componentId= componentIdArray[componentIdArray.length - 1];
+
+			TapestryIndex tapestryIndex= Activator.getDefault().getTapestryIndex();
+			IComponent component= tapestryIndex.getStandardComponentMap().get(componentId);
+
+			parameterList= new ArrayList<Parameter>(
+					component.getParameters());
+		} else {
+			parameterList= new ArrayList<Parameter>();
+			parameterList.add(getJwcidParameter());
+		}
+
+		// create a Map mapping parameter names to parameters for filtering
+		Map<String, Parameter> parameterMap= new HashMap<String, Parameter>();
+		List<String> parameterKeyList= new ArrayList<String>();
+		for (Parameter p: parameterList) {
+			parameterMap.put(p.getName(), p);
+			parameterKeyList.add(p.getName());
+		}
+
+		// filter the keys and remove filtered ones from map
+		List<String> removedParameterKeyList= completionProposalFilter
+				.filterStringListAndReturnFiltered(parameterKeyList,
+						attributePrefix);
+
+		for (String filteredKey: removedParameterKeyList) {
+			parameterList.remove(parameterMap.get(filteredKey));
+		}
+
+		String suffix= "=\"\"";
+		if (contentAfter.matches("(?s)^\"(?![\"\\w])")) {
+			// a " follows immediately after the caret, so don't add a closing "
+			suffix= "=\"";
+		}
+		int additionalCursorOffset= 2;
+		for (Parameter p: parameterList) {
+			String completionProposalString= p.getName();
+			int attributePrefixLength= attributePrefix.length();
+			String displayName= p.getName() + " : " + p.getType().getValue()
+					+ " (" + p.getDirection().getValue() + ")";
+
+			ICompletionProposal completionProposal=
+				new CompletionProposal(
+					completionProposalString + suffix,
+					offset - attributePrefixLength,
+					attributePrefixLength,
+					completionProposalString.length()
+						+ additionalCursorOffset,
+					Activator.getImage("icons/t4e.png"),
+					displayName,
+					getContextInformation("", ""),
+					completionProposalString
+				);
+
+
+			result.add(completionProposal);
 		}
 
 		return result.toArray(new ICompletionProposal[result.size()]);
