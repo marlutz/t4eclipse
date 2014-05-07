@@ -6,7 +6,7 @@
  * http://opensource.org/licenses/MIT
  *
  * Contributors:
- *     Marcel Lutz - Content assist tools (e.g. for completion proposals)
+ *     Marcel Lutz - PrefixStringListFilter
  ******************************************************************************/
 package ch.mlutz.plugins.t4e.tools.stringfilter;
 

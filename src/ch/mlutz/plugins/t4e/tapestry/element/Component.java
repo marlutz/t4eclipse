@@ -22,11 +22,6 @@ import java.util.Collections;
 /**
  * TapestryComponent
  *
- * <p>
- * Describe TapestryComponent here...
- * </p>
- *
- *
  * @author mlutz
  *
  */
