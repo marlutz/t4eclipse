@@ -11,7 +11,6 @@
 package ch.mlutz.plugins.t4e.log;
 
 import org.eclipse.core.runtime.ILog;
-import org.eclipse.core.runtime.IStatus;
 
 /**
  *

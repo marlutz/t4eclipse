@@ -19,17 +19,22 @@ package ch.mlutz.plugins.t4e.index;
  * @version 1.0 27.01.2014
  */
 
-import static ch.mlutz.plugins.t4e.tools.EclipseTools.extractFileBase;
-import static ch.mlutz.plugins.t4e.tools.EclipseTools.getPackageFragmentRoots;
-import static ch.mlutz.plugins.t4e.tools.StringTools.join;
-import static ch.mlutz.plugins.t4e.tapestry.element.ParameterDirection.*;
-import static ch.mlutz.plugins.t4e.tapestry.element.ParameterType.*;
+import static ch.mlutz.plugins.t4e.tapestry.element.ParameterDirection.IN;
+import static ch.mlutz.plugins.t4e.tapestry.element.ParameterDirection.OUT;
+import static ch.mlutz.plugins.t4e.tapestry.element.ParameterType.BOOLEAN;
+import static ch.mlutz.plugins.t4e.tapestry.element.ParameterType.COLLECTION;
+import static ch.mlutz.plugins.t4e.tapestry.element.ParameterType.FORMAT;
+import static ch.mlutz.plugins.t4e.tapestry.element.ParameterType.INTEGER;
+import static ch.mlutz.plugins.t4e.tapestry.element.ParameterType.LISTENER;
+import static ch.mlutz.plugins.t4e.tapestry.element.ParameterType.OBJECT;
+import static ch.mlutz.plugins.t4e.tapestry.element.ParameterType.PRIMARYKEYCONVERTER;
+import static ch.mlutz.plugins.t4e.tapestry.element.ParameterType.STRING;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -47,8 +52,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.IDocument;
 
@@ -59,12 +62,7 @@ import ch.mlutz.plugins.t4e.serializer.EclipseSerializer;
 import ch.mlutz.plugins.t4e.tapestry.TapestryModule;
 import ch.mlutz.plugins.t4e.tapestry.element.IComponent;
 import ch.mlutz.plugins.t4e.tapestry.element.Parameter;
-import ch.mlutz.plugins.t4e.tapestry.element.ParameterType;
 import ch.mlutz.plugins.t4e.tapestry.element.StandardComponent;
-import ch.mlutz.plugins.t4e.tapestry.parsers.AppSpecificationParser;
-import ch.mlutz.plugins.t4e.tapestry.parsers.SpecificationParser;
-
-import java.util.Collections;
 
 /**
  * Stores the associations between Tapestry4 specification files and the

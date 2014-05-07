@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextDoubleClickStrategy;
@@ -20,10 +19,7 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 
-import ch.mlutz.plugins.t4e.log.EclipseLogFactory;
-import ch.mlutz.plugins.t4e.log.IEclipseLog;
 import ch.mlutz.plugins.t4e.tapestry.editor.hyperlink.DelegatingHyperlinkDetector;
-import ch.mlutz.plugins.t4e.tapestry.editor.hyperlink.IHyperlinkDetectorDelegate;
 import ch.mlutz.plugins.t4e.tapestry.editor.hyperlink.JwcidHyperlinkDetectorDelegate;
 import ch.mlutz.plugins.t4e.tapestry.editor.hyperlink.OgnlHyperlinkDetectorDelegate;
 import ch.mlutz.plugins.t4e.tools.stringfilter.PrefixStringListFilter;
