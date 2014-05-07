@@ -79,8 +79,6 @@ public class TagContentAssistProcessor implements IContentAssistProcessor {
 
 	private static final String SIGNATURE_PATTERN_REPLACEMENT= "$1";
 
-
-
 	private static final Pattern signaturePattern=
 			Pattern.compile(SIGNATURE_PATTERN_STRING);
 
