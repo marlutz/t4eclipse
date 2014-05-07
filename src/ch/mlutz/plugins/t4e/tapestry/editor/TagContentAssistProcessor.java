@@ -131,13 +131,13 @@ public class TagContentAssistProcessor implements IContentAssistProcessor {
 		String attributeValue= StringTools.getShortestSubstringStartingFrom(
 				attributePrefix, '"');
 
-		if (attributeValue == null) {
-			// return empty result
-			return getEmptyResult();
-		}
-
 		IFile documentFile= Activator.getDefault().getTapestryIndex()
-			.getDocumentToFileMapping(document);
+				.getDocumentToFileMapping(document);
+
+		if (attributeValue == null) {
+			return computeAttributeCompletionProposals(caretOffset, document,
+					documentFile);
+		}
 
 		if (attributePrefix.startsWith("jwcid=\"")) {
 			String jwcidPrefix= StringTools.getShortestSubstringStartingFrom(
@@ -158,11 +158,9 @@ public class TagContentAssistProcessor implements IContentAssistProcessor {
 				return getEmptyResult();
 			}
 		} else {
-			// get jwcid via regex
-			// get sensible attributes for this jwcid
+			return computeAttributeCompletionProposals(caretOffset, document,
+					documentFile);
 		}
-
-		return getEmptyResult();
 	}
 
 	protected ICompletionProposal[] computeJwcidCompletionProposals(
