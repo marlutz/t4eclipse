@@ -18,5 +18,15 @@ package ch.mlutz.plugins.t4e.tapestry.element;
  *
  */
 public enum ParameterDirection {
-	IN, IN_OUT, OUT;
+	IN("in"), IN_OUT("in/out"), OUT("out");
+
+	private String value;
+
+	private ParameterDirection(String value) {
+		this.value= value;
+	}
+
+	public String getValue() {
+		return value;
+	}
 }
